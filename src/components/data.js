@@ -376,7 +376,7 @@ const modulesData = [
         description:
           "Format string (defaults to ‘{used}/{total} ({percent:05.02f}%)’)",
         defaultChoice: "{used}/{total} ({percent:05.02f}%)",
-        example: "{used} ({percent:05f}%)",
+        example: "{used} ({percent:3.0f}%) => 2.83GiB ( 76%)",
       },
       {
         name: "memory.usedonly",

@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { modulesData } from "./data.js";
 
+import { v4 as uuidv4 } from "uuid";
+
+import InputAndTags from "./InputAndTags.jsx";
+import ChangeDefaultParametersCheckBox from "./ChangeDefaultParametersCheckBox.jsx";
+import ParametersInput from "./ParametersInput.jsx";
+
 export default function InputField() {
   const [modulesArray, setModulesArray] = useState([]);
   const [checkedArray, setCheckedArray] = useState([]);
@@ -8,6 +14,10 @@ export default function InputField() {
   const [inputValue, setInputValue] = useState("");
   const [modulesParameters, setModulesParameters] = useState([]);
   const [changeIfParameterAdded, setChangeIfParameterAdded] = useState(false);
+  const [unCheckedToggle, setUnCheckedToggle] = useState({
+    value: false,
+    id: null,
+  });
 
   // console.log("modulesArray", modulesArray);
   // console.log("checkArray", checkedArray);
@@ -15,7 +25,7 @@ export default function InputField() {
 
   let dependencies = modulesArray
     .map((module) => {
-      console.log(module);
+      // console.log(module);
       if (module.requirements) {
         return module.requirements.map((requirement) => requirement).join(" ");
       } else {
@@ -56,52 +66,85 @@ export default function InputField() {
 
   useEffect(
     function () {
-      setListOfModuleParams((preValue) => {
-        let hasParameters = false;
-        let temp = "";
-        modulesParameters.forEach((modulesParameter) => {
-          if (!modulesParameter.parameters) return;
-          modulesParameter.parameters.map((parameter) => {
-            if (parameter.currentValue !== "") {
-              temp += `${parameter.name}="` + `${parameter.currentValue}" `;
-              hasParameters = true;
-            }
-          });
-        });
-        if (!hasParameters) {
-          temp = "<list of module parameters>";
+      let hasParameters = false;
+      let temp = "";
+      let cleanDefaultsOf = null;
+
+      modulesParameters.forEach((modulesParameter, index) => {
+        if (!modulesParameter.parameters) return;
+        if (checkedArray[index] === false) {
+          if (
+            modulesArray[index].id ===
+            unCheckedToggle.id.substring("change-".length)
+          ) {
+            cleanDefaultsOf = unCheckedToggle.id.substring("change-".length);
+            return;
+          } else {
+            return;
+          }
         }
+        modulesParameter.parameters.map((parameter) => {
+          if (parameter.currentValue !== "") {
+            temp += `${parameter.name}="` + `${parameter.currentValue}" `;
+            hasParameters = true;
+          }
+        });
+      });
+      if (!hasParameters) {
+        temp = "<list of module parameters>";
+      }
+
+      setListOfModuleParams((preValue) => {
         return temp;
       });
+
+      if (cleanDefaultsOf === null) {
+        return;
+      } else {
+        setModulesParameters((preModuleParameters) => {
+          let tempPreModuleParameters = [...preModuleParameters];
+          console.log(tempPreModuleParameters);
+          tempPreModuleParameters.forEach((moduleParameter, index) => {
+            if (moduleParameter.id === cleanDefaultsOf) {
+              moduleParameter.parameters.forEach(
+                (parameter) => (parameter.currentValue = "")
+              );
+            }
+          });
+          return tempPreModuleParameters;
+        });
+      }
     },
-    [changeIfParameterAdded, modulesArray.length]
+    [changeIfParameterAdded, modulesArray.length, unCheckedToggle]
   );
 
-  function generateCustomUUID() {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
-      /[xy]/g,
-      function (c) {
-        const r = (Math.random() * 16) | 0;
-        const v = c === "x" ? r : (r & 0x3) | 0x8;
-        return v.toString(16);
-      }
-    );
-  }
-
   function handleInputOnChange(event) {
-    let value = event.target.value;
+    let value = event.target.value.toLowerCase();
+
     if (value[value.length - 1] === " " && value.trim() !== "") {
       modulesData.forEach((module) => {
-        if (module.name === value.trim()) addTag(module);
+        if (module.name === value.trim() && !doesModuleAlreadyExist(value))
+          addTag(module);
       });
       setInputValue("");
     } else setInputValue(value);
   }
 
+  function doesModuleAlreadyExist(value) {
+    if (modulesArray.length !== 0) {
+      let moduleAlreadyExists = false;
+      modulesArray.forEach((module) => {
+        if (module.name === value.trim()) moduleAlreadyExists = true;
+      });
+      if (moduleAlreadyExists) return true;
+    }
+  }
+
   function addTag(module) {
+    let id = uuidv4();
     setModulesArray((preModules) => {
       let tempPreModules = [...preModules];
-      tempPreModules.push({ ...module, id: generateCustomUUID() });
+      tempPreModules.push({ ...module, id: id });
       return tempPreModules;
     });
 
@@ -115,6 +158,7 @@ export default function InputField() {
       let tempPreModuleParameters = [...preModuleParameters];
       if (module.parameters) {
         tempPreModuleParameters.push({
+          id: id,
           hasParameters: true,
           parameters: getParams(),
         });
@@ -162,41 +206,16 @@ export default function InputField() {
 
   return (
     <>
-      <div className="tags-wrapper">
-        <label htmlFor="tags">Modules</label>
-        <div id="tags-input-wrapper">
-          <input
-            type="text"
-            value={inputValue}
-            id="tags"
-            ref={inputRef}
-            onChange={handleInputOnChange}
-          />
-          <div
-            id="created-tags-wrapper"
-            style={{ marginTop: modulesArray.length ? "10px" : "0" }}
-          >
-            {modulesArray.map((module) => {
-              const { id, name } = module;
-              return (
-                <span
-                  className="tag"
-                  data-id={id}
-                  key={id}
-                  onClick={(event) => {
-                    deleteTag(event.target.dataset.id);
-                  }}
-                >
-                  {name}
-                </span>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-      <div className="output-text">
+      <InputAndTags
+        inputValue={inputValue}
+        inputRef={inputRef}
+        handleInputOnChange={handleInputOnChange}
+        modulesArray={modulesArray}
+        deleteTag={deleteTag}
+      />
+      <OutputText>
         <pre>{outputText}</pre>
-      </div>
+      </OutputText>
       <div className="parameters-wrapper">
         <div>dependencies : {dependencies}</div>
         {modulesArray.map((module, index) => {
@@ -208,70 +227,24 @@ export default function InputField() {
               </div>
               <div>
                 {parameters && (
-                  <div>
-                    <input
-                      type="checkbox"
-                      id={`change-${id}`}
-                      className="change-default"
-                      name="Change Default"
-                      onChange={(event) => {
-                        if (checkedArray[index] !== event.target.checked) {
-                          setCheckedArray((prevCheckedArray) => {
-                            let tempCheckedArray = [...prevCheckedArray];
-                            tempCheckedArray[index] = event.target.checked;
-                            return tempCheckedArray;
-                          });
-                        }
-                      }}
-                    />
-                    <label htmlFor={`change-${id}`}>Change Default</label>
-                  </div>
+                  <ChangeDefaultParametersCheckBox
+                    id={id}
+                    index={index}
+                    checkedArray={checkedArray}
+                    setCheckedArray={setCheckedArray}
+                    setUnCheckedToggle={setUnCheckedToggle}
+                  />
                 )}
               </div>
               <div>
                 {checkedArray[index] && module.parameters && (
-                  <div className="parameters-input-wrappers">
-                    {module.parameters.map((parameter, parameterIndex) => {
-                      let { name, description, defaultChoice, example } =
-                        parameter;
-                      return (
-                        <div key={`${name}-${id}`}>
-                          <div className="name-and-description">
-                            {name} : {description}
-                          </div>
-                          <div>
-                            <input
-                              type="text"
-                              placeholder={defaultChoice}
-                              onChange={(event) => {
-                                setModulesParameters((preModuleParameters) => {
-                                  let tempPreModuleParameters = [
-                                    ...preModuleParameters,
-                                  ];
-                                  tempPreModuleParameters[index].parameters[
-                                    parameterIndex
-                                  ].currentValue = event.target.value.trim();
-                                  return tempPreModuleParameters;
-                                });
-                                setChangeIfParameterAdded(
-                                  (preValue) => !preValue
-                                );
-                                // console.log(
-                                //   JSON.stringify(
-                                //     modulesParameters[index].parameters[
-                                //       parameterIndex
-                                //     ]
-                                //   )
-                                // );
-                                // console.log(event.target.value);
-                              }}
-                            />
-                            <span className="example">Eg : {example}</span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+                  <ParametersInput
+                    id={id}
+                    index={index}
+                    setModulesParameters={setModulesParameters}
+                    setChangeIfParameterAdded={setChangeIfParameterAdded}
+                    module={module}
+                  />
                 )}
               </div>
             </div>
@@ -280,4 +253,8 @@ export default function InputField() {
       </div>
     </>
   );
+}
+
+function OutputText({ children }) {
+  return <div className="output-text">{children}</div>;
 }
