@@ -154,6 +154,7 @@ import InputField from "../components/InputField";
   }
 
   .output-text pre {
+    position: relative;
     font-family: var(--secondary-font);
     line-height: 1.2;
     font-size: 1rem;
@@ -161,6 +162,29 @@ import InputField from "../components/InputField";
     margin: auto;
     border: 2px dashed var(--border-color);
     padding: 1rem 2rem;
+  }
+
+  .copy-button {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+
+    height: 40px;
+    width: 40px;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-color);
+    border-radius: 9px;
+    padding: 5px;
+  }
+
+  .copy-button:hover {
+    background-color: #0a0a0a;
   }
 
   .parameters-wrapper {

@@ -267,7 +267,7 @@ const modulesData = [
   {
     name: "layout",
     description: "Displays the current keyboard layout using libX11",
-    tech: ["", "python"],
+    tech: ["", "py"],
     requirements: ["libX11.so.6", "xkbgroup"],
     parameters: [
       {
@@ -289,7 +289,7 @@ const modulesData = [
   {
     name: "layout-xkb",
     description: "Displays the current keyboard layout using libX11",
-    tech: ["", "python"],
+    tech: ["", "py"],
     requirements: ["libX11.so.6", "xkbgroup"],
     parameters: [
       {
@@ -311,7 +311,7 @@ const modulesData = [
   {
     name: "layout_xkb",
     description: "Displays the current keyboard layout using libX11",
-    tech: ["", "python"],
+    tech: ["", "py"],
     requirements: ["libX11.so.6", "xkbgroup"],
     parameters: [
       {
@@ -384,6 +384,214 @@ const modulesData = [
           "Only show the amount of RAM in use (defaults to False). Same as memory.format=’{used}’",
         defaultChoice: "False",
         example: "True or False",
+      },
+    ],
+  },
+  {
+    name: "nic",
+    description:
+      "Displays the name, IP address(es) and status of each available network interface.",
+    tech: ["py", "ex", "ex"],
+    requirements: ["netifaces", "iw", "iwgetid"],
+    parameters: [
+      {
+        name: "nic.exclude",
+        description:
+          "Comma-separated list of interface prefixes (supporting regular expressions) to exclude (defaults to ‘lo,virbr,docker,vboxnet,veth,br,.*:avahi’)",
+        defaultChoice: "lo,virbr,docker,vboxnet,veth,br,.*:avahi",
+        example:
+          "lo (exclude loopback interface), .*:avahi(exclusion of avahi interfaces)",
+      },
+      {
+        name: "nic.include",
+        description: "Comma-separated list of interfaces to include",
+        defaultChoice: "",
+        example: "eth0 (include eth0 interface)",
+      },
+      {
+        name: "nic.states",
+        description:
+          "Comma-separated list of states to show (prefix with ‘^’ to invert - i.e. ^down -> show all devices that are not in state down)",
+        defaultChoice: "",
+        example: "^up,^down",
+      },
+      {
+        name: "nic.format",
+        description:
+          "Format string (defaults to ‘{intf} {state} {ip} {ssid} {strength}’)",
+        defaultChoice: "{intf} {state} {ip} {ssid} {strength}",
+        example: "{intf} {state}",
+      },
+      {
+        name: "nic.strength_warning",
+        description:
+          "Integer to set the threshold for warning state (defaults to 50)",
+        defaultChoice: "50",
+        example: "50, 60, 90",
+      },
+      {
+        name: "nic.strength_critical",
+        description:
+          "Integer to set the threshold for critical state (defaults to 30)",
+        defaultChoice: "30",
+        example: "50, 60, 90",
+      },
+    ],
+  },
+  {
+    name: "ping",
+    description:
+      "Periodically checks the RTT of a configurable host using ICMP echos",
+    tech: ["ex"],
+    requirements: ["ping"],
+    parameters: [
+      {
+        name: "ping.address",
+        description: "IP address to check",
+        defaultChoice: "8.8.8.8",
+        example: "Any IP address",
+      },
+      {
+        name: "ping.timeout",
+        description: "Timeout for waiting for a reply (defaults to 5.0)",
+        defaultChoice: "5.0",
+        example: "5.0, 10.0",
+      },
+      {
+        name: "ping.probes",
+        description: "Number of probes to send (defaults to 5)",
+        defaultChoice: "5",
+        example: "5, 10",
+      },
+      {
+        name: "ping.warning",
+        description:
+          "Threshold for warning state, in seconds (defaults to 1.0)",
+        defaultChoice: "1.0",
+        example: "2.0, 3.0",
+      },
+      {
+        name: "ping.critical",
+        description:
+          "Threshold for critical state, in seconds (defaults to 2.0)",
+        defaultChoice: "2.0",
+        example: "3.0, 4.0",
+      },
+    ],
+  },
+  {
+    name: "pulseaudio **Will be deprecated**",
+    description:
+      "Displays volume and mute status and controls for PulseAudio devices. Use wheel up and down to change volume, left click mutes, right click opens pavucontrol.",
+    tech: ["ex", "ex", "ex"],
+    requirements: ["pulseaudio", "pactl", "pavucontrol"],
+    parameters: [
+      {
+        name: "pulseaudio.autostart",
+        description:
+          "If set to ‘true’ (default is ‘false’), automatically starts the pulseaudio daemon if it is not running",
+        defaultChoice: "false",
+        example: "false, true",
+      },
+      {
+        name: "pulseaudio.percent_change",
+        description:
+          "How much to change volume by when scrolling on the module (default is 2%)",
+        defaultChoice: "2%",
+        example: "5%, 7%",
+      },
+      {
+        name: "pulseaudio.limit",
+        description:
+          "Upper limit for setting the volume (default is 0%, which means ‘no limit’) Note: If the left and right channels have different volumes, the limit might not be reached exactly.",
+        defaultChoice: "0%",
+        example: "10%, 20%",
+      },
+      {
+        name: "pulseaudio.showbars",
+        description:
+          "1 for showing volume bars, requires –markup=pango; 0 for not showing volume bars (default)",
+        defaultChoice: "0",
+        example: "0, 1",
+      },
+      {
+        name: "pulseaudio.showdevicename",
+        description:
+          "If set to ‘true’ (default is ‘false’), the currently selected default device is shown. Per default, the sink/source name returned by “pactl list sinks short” is used as display name.",
+        defaultChoice: "false",
+        example: "false, true",
+      },
+    ],
+  },
+  {
+    name: "pulsectl",
+    description:
+      "Displays volume and mute status and controls for PulseAudio devices. Use wheel up and down to change volume, left click mutes, right click opens pavucontrol.",
+    tech: ["py"],
+    requirements: ["pulsectl"],
+    parameters: [
+      {
+        name: "pulsectl.autostart",
+        description:
+          "If set to ‘true’ (default is ‘false’), automatically starts the pulsectl daemon if it is not running",
+        defaultChoice: "false",
+        example: "false, true",
+      },
+      {
+        name: "pulsectl.percent_change",
+        description:
+          "How much to change volume by when scrolling on the module (default is 2%)",
+        defaultChoice: "2%",
+        example: "2%, 5%",
+      },
+      {
+        name: "pulsectl.limit",
+        description:
+          "Upper limit for setting the volume (default is 0%, which means ‘no limit’)",
+        defaultChoice: "0%",
+        example: "10%, 20%",
+      },
+      {
+        name: "pulsectl.popup-filter",
+        description:
+          "Comma-separated list of device strings (if the device name contains it) to exclude from the default device popup menu (e.g. Monitor for sources)",
+        defaultChoice: "",
+        example: "Monitor, Headphones",
+      },
+      {
+        name: "pulsectl.showbars",
+        description:
+          "‘true’ for showing volume bars, requires –markup=pango; ‘false’ for not showing volume bars (default)",
+        defaultChoice: "false",
+        example: "false, true",
+      },
+      {
+        name: "pulsectl.showdevicename",
+        description:
+          "If set to ‘true’ (default is ‘false’), the currently selected default device is shown. Per default, the sink/source name returned by “pactl list sinks short” is used as display name.",
+        defaultChoice: "false",
+        example: "false, true",
+      },
+    ],
+  },
+  {
+    name: "redshift",
+    description: "Displays the current color temperature of redshift",
+    tech: ["ex"],
+    requirements: ["redshift"],
+    parameters: [
+      {
+        name: "redshift.location",
+        description:
+          " location provider, either of ‘auto’ (default), ‘geoclue2’, ‘ipinfo’ or ‘manual’ ‘auto’ uses whatever redshift is configured to do",
+        defaultChoice: "auto",
+        example: "geoclue2, ipinfo, manual",
+      },
+      {
+        name: "redshift.lat",
+        description: "latitude if location is set to ‘manual’",
+        defaultChoice: "",
+        example: "38.9072",
       },
     ],
   },
