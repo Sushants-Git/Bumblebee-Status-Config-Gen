@@ -591,7 +591,130 @@ const modulesData = [
         name: "redshift.lat",
         description: "latitude if location is set to ‘manual’",
         defaultChoice: "",
-        example: "38.9072",
+        example: "38.9072° N",
+      },
+      {
+        name: "redshift.lon",
+        description: "longitude if location is set to ‘manual’",
+        defaultChoice: "",
+        example: "77.0369° W",
+      },
+      {
+        name: "redshift.show_transition",
+        description:
+          "information about the transitions (x% day) defaults to True",
+        defaultChoice: "True",
+        example: "True, False",
+      },
+      {
+        name: "redshift.adjust",
+        description:
+          "set this to ‘true’ (defaults to false) to let bumblebee-status adjust color temperature, instead of just showing the current settings",
+        defaultChoice: "true",
+        example: "true, false",
+      },
+    ],
+  },
+  {
+    name: "scroll",
+    description:
+      "Displays two widgets that can be used to scroll the whole status bar",
+    tech: [""],
+    requirements: [""],
+    parameters: [
+      {
+        name: "scroll.width",
+        description: "Width (in number of widgets) to display",
+        defaultChoice: "",
+        example: "3, 4, 5",
+      },
+    ],
+  },
+  {
+    name: "sensors2",
+    description: "Displays sensor temperature and CPU frequency",
+    tech: [""],
+    requirements: [""],
+    parameters: [
+      {
+        name: "sensors2.chip",
+        description:
+          "‘sensors -u’ compatible filter for chip to display (default to empty - show all chips)",
+        defaultChoice: "",
+        example: "coretemp-isa-0000",
+      },
+      {
+        name: "sensors2.showcpu",
+        description: "Enable or disable CPU frequency display (default: true)",
+        defaultChoice: "true",
+        example: "true, false",
+      },
+      {
+        name: "sensors2.showtemp",
+        description: "Enable or disable temperature display (default: true)",
+        defaultChoice: "true",
+        example: "true, false",
+      },
+      {
+        name: "sensors2.showfan",
+        description: "Enable or disable fan display (default: true)",
+        defaultChoice: "true",
+        example: "true, false",
+      },
+      {
+        name: "sensors2.showother",
+        description:
+          "Enable or display ‘other’ sensor readings (default: false)",
+        defaultChoice: "false",
+        example: "true, false",
+      },
+      {
+        name: "sensors2.showname",
+        description: "Enable or disable show of sensor name (default: false)",
+        defaultChoice: "false",
+        example: "true, false",
+      },
+      {
+        name: "sensors2.chip_include",
+        description:
+          "Comma-separated list of chip to include (defaults to ‘’ will include all by default, example: ‘coretemp,bat’)",
+        defaultChoice: "",
+        example: "coretemp,bat",
+      },
+      {
+        name: "sensors2.chip_exclude",
+        description:
+          "Comma separated list of chip to exclude (defaults to ‘’ will exclude none by default)",
+        defaultChoice: "",
+        example: "coretemp,bat",
+      },
+      {
+        name: "sensors2.field_include",
+        description:
+          "Comma separated list of chip to include (defaults to ‘’ will include all by default, example: ‘temp,fan’)",
+        defaultChoice: "",
+        example: "temp,fan",
+      },
+      {
+        name: "sensors2.field_exclude",
+        description:
+          "Comma separated list of chip to exclude (defaults to ‘’ will exclude none by default)",
+        defaultChoice: "",
+        example: "temp,fan",
+      },
+      {
+        name: "sensors2.chip_field_exclude",
+        description:
+          "Comma separated list of chip field to exclude (defaults to ‘’ will exclude none by default, example: ‘coretemp-isa-0000.temp1,coretemp-isa-0000.fan1’)",
+        defaultChoice: "",
+        example: "coretemp-isa-0000.temp1,coretemp-isa-0000.fan1",
+      },
+      {
+        name: "sensors2.chip_field_include",
+        description:
+          "Comma-separated list of adaper field to include (defaults to ‘’ will include all by default)",
+        defaultChoice: "",
+        example: "coretemp-isa-0000.temp1,coretemp-isa-0000.fan1",
       },
     ],
   },

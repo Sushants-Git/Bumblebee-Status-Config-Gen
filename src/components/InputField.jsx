@@ -26,30 +26,29 @@ export default function InputField() {
   // console.log("checkArray", checkedArray);
   // console.log("modulesParameters", modulesParameters);
 
-
   let dependencies = null;
   let dependenciesArray = [];
 
   for (let i = 0; i < modulesArray.length; i++) {
     if (!modulesArray[i].requirements) continue;
     modulesArray[i].requirements.forEach((requirement, index) => {
-      if (notInDependenciesArray(requirement))
+      if (notInDependenciesArray(requirement)) {
         dependenciesArray.push({
           value: requirement,
           tech: modulesArray[i].tech[index],
         });
+      }
     });
   }
 
   function notInDependenciesArray(requirement) {
-    return !dependenciesArray.includes(
+    return !dependenciesArray.some(
       (requirementObj) => requirementObj.value === requirement
     );
   }
 
   dependencies = dependenciesArray
     .map((obj) => {
-      console.log(obj);
       return obj.value;
     })
     .join(" ");
