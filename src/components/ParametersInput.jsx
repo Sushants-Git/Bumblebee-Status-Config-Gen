@@ -29,7 +29,9 @@ export default function ParametersInput({
                   setChangeIfParameterAdded((preValue) => !preValue);
                 }}
               />
-              <span className="example">Eg : {example}</span>
+              <span className="example">
+                {example === "" ? "" : `Eg : ${example}`}
+              </span>
             </div>
           </div>
         );

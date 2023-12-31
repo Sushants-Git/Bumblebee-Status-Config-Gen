@@ -58,6 +58,23 @@ import InputField from "../components/InputField";
     color: inherit;
     font-family: inherit;
     border: 1px solid var(--border-color);
+    max-width: 390px;
+  }
+
+  select {
+    font-size: 1.25rem;
+    background-color: var(--bg-color);
+    border: none;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    color: inherit;
+    font-family: inherit;
+    border: 1px solid var(--border-color);
+    min-width: 390px;
+    
+    -moz-appearance:none; /* Firefox */
+    -webkit-appearance:none; /* Safari and Chrome */
+    appearance:none;
   }
 
   .tags-wrapper {
@@ -92,6 +109,7 @@ import InputField from "../components/InputField";
     align-items: center;
     gap: 30px;
     margin-bottom: 10px;
+    justify-content: space-between;
   }
 
   .input-wrapper input {

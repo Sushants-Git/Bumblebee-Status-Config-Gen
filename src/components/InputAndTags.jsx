@@ -4,6 +4,9 @@ export default function InputAndTags({
   handleInputOnChange,
   modulesArray,
   deleteTag,
+  themesData,
+  setSelectedTheme,
+  selectedTheme,
 }) {
   return (
     <div className="tags-wrapper">
@@ -17,6 +20,22 @@ export default function InputAndTags({
             ref={inputRef}
             onChange={handleInputOnChange}
           />
+        </div>
+        <div className="input-wrapper">
+          <label htmlFor="theme-select">Theme</label>
+          <select
+            name="theme"
+            id="theme-select"
+            value={selectedTheme}
+            onChange={(event) => setSelectedTheme(event.target.value)}
+          >
+            <option value="">-- Please choose a theme --</option>
+            {themesData.map((theme) => (
+              <option value={theme.themeTag} key={theme.themeTag}>
+                {theme.name}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="tags-created">
           {!!modulesArray.length && (

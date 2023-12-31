@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { modulesData } from "./data.js";
+import { modulesData, themesData } from "./data.js";
 
 import { v4 as uuidv4 } from "uuid";
 
@@ -21,6 +21,7 @@ export default function InputField() {
     id: null,
   });
   const [copyButtonClicked, setCopyButtonClicked] = useState(false);
+  const [selectedTheme, setSelectedTheme] = useState("");
 
   // console.log("modulesArray", modulesArray);
   // console.log("checkArray", checkedArray);
@@ -132,9 +133,20 @@ export default function InputField() {
     [changeIfParameterAdded, modulesArray.length, unCheckedToggle.value]
   );
 
+  useEffect(() => {
+    setTheme((preValue) => {
+      if (selectedTheme === "") {
+        return "<theme>";
+      }
+      const theme = themesData.find(
+        (theme) => theme.themeTag === selectedTheme
+      );
+      return theme.themeTag;
+    });
+  }, [selectedTheme]);
+
   function handleInputOnChange(event) {
     let value = event.target.value.toLowerCase();
-
     if (value[value.length - 1] === " " && value.trim() !== "") {
       const module = modulesData.find((module) => module.name === value.trim());
       if (module && !doesModuleAlreadyExist(value)) {
@@ -219,6 +231,9 @@ export default function InputField() {
         handleInputOnChange={handleInputOnChange}
         modulesArray={modulesArray}
         deleteTag={deleteTag}
+        themesData={themesData}
+        selectedTheme={selectedTheme}
+        setSelectedTheme={setSelectedTheme}
       />
       <OutputText>
         <pre>
@@ -227,8 +242,28 @@ export default function InputField() {
             className="copy-button"
             onClick={() => {
               if (!copyButtonClicked) {
-                navigator.clipboard.writeText(outputText).then(() => {
-                  toast("Copied to clipboard!");
+                let copiedText = `bar {\n\tstatus_command ${pathToBumblebee} \\`;
+
+                if (listOfModules !== "<list of modules>") {
+                  copiedText += `\n\t\t-m ${listOfModules} \\`;
+                }
+
+                if (listOfModuleParams !== "<list of module parameters>") {
+                  copiedText += `\n\t\t-p ${listOfModuleParams} \\`;
+                }
+
+                if (theme !== "<theme>") {
+                  copiedText += `\n\t\t-t ${theme}`;
+                }
+
+                copiedText += "\n}";
+
+                console.log(copiedText);
+                navigator.clipboard.writeText(copiedText).then(() => {
+                  toast.message("Copied to clipboard !", {
+                    description:
+                      "All the things that have not been selected will be ignored in the copy.",
+                  });
                   copiedIcon();
                 });
               }

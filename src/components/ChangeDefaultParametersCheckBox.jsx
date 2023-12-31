@@ -9,7 +9,7 @@ export default function ChangeDefaultParametersCheckBox({
     if (checkedArray[index] !== event.target.checked) {
       setCheckedArray((prevCheckedArray) => {
         let tempCheckedArray = [...prevCheckedArray];
-        tempCheckedArray[index] = event.target.checked;
+        tempCheckedArray[index] = event.target.checked; // This line is important to maintain the order of the checkedArray
         return tempCheckedArray;
       });
     }

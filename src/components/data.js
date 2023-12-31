@@ -3253,4 +3253,166 @@ const modulesData = [
   },
 ];
 
-export { moduleNames, modulesData };
+const themesData = [
+  {
+    name: "Gruvbox Powerline",
+    themeTag: "gruvbox-powerline",
+    contrib: [
+      {
+        name: "TheEdgeOfRage",
+        link: "https://github.com/TheEdgeOfRage",
+      },
+    ],
+  },
+  {
+    name: "Gruvbox Powerline Light",
+    themeTag: "gruvbox-powerline-light",
+    contrib: [
+      {
+        name: "freed00m",
+        link: "https://github.com/freed00m",
+      },
+    ],
+  },
+  {
+    name: "Solarized Powerline",
+    themeTag: "solarized-powerline",
+  },
+  {
+    name: "Gruvbox",
+    themeTag: "gruvbox",
+  },
+  {
+    name: "Gruvbox Light",
+    themeTag: "gruvbox-light",
+    contrib: [
+      {
+        name: "freed00m",
+        link: "https://github.com/freed00m",
+      },
+    ],
+  },
+  {
+    name: "Solarized",
+    themeTag: "solarized",
+  },
+  {
+    name: "Powerline",
+    themeTag: "powerline",
+  },
+  {
+    name: "Greyish Powerline",
+    themeTag: "greyish-powerline",
+    contrib: [
+      {
+        name: "oshua Bark",
+      },
+    ],
+  },
+  {
+    name: "Iceberg",
+    themeTag: "iceberg",
+    contrib: [
+      {
+        name: "whzup",
+        link: "https://github.com/whzup",
+      },
+    ],
+  },
+  {
+    name: "Iceberg Powerline",
+    themeTag: "iceberg-powerline",
+    contrib: [
+      {
+        name: "whzup",
+        link: "https://github.com/whzup",
+      },
+    ],
+  },
+  {
+    name: "Iceberg Dark Powerline",
+    themeTag: "iceberg-dark-powerline",
+    contrib: [
+      {
+        name: "gkeep",
+        link: "https://github.com/gkeep",
+      },
+    ],
+  },
+  {
+    name: "Iceberg Rainbow",
+    themeTag: "iceberg-rainbow",
+    contrib: [
+      {
+        name: "gkeep",
+        link: "https://github.com/whzup",
+      },
+    ],
+  },
+  {
+    name: "Iceberg Contrast",
+    themeTag: "iceberg-contrast",
+    contrib: [
+      {
+        name: "martindoublem",
+        link: "https://github.com/martindoublem",
+      },
+    ],
+  },
+  {
+    name: "One Dark Powerline",
+    themeTag: "onedark-powerline",
+    contrib: [
+      {
+        name: "dillasyx",
+        link: "https://github.com/dillasyx",
+      },
+    ],
+  },
+  {
+    name: "Dracula Powerline",
+    themeTag: "dracula-powerline",
+    contrib: [
+      {
+        name: "xsteadfastx",
+        link: "https://github.com/xsteadfastx",
+      },
+    ],
+  },
+  {
+    name: "Nord Powerline",
+    themeTag: "nord-powerline",
+    contrib: [
+      {
+        name: "uselessthird",
+        link: "https://github.com/uselessthird",
+      },
+    ],
+  },
+  {
+    name: "Night Powerline",
+    themeTag: "night-powerline",
+    contrib: [
+      {
+        name: "LtPeriwinkle",
+        link: "https://github.com/LtPeriwinkle",
+      },
+    ],
+  },
+  {
+    name: "Default",
+    themeTag: "default",
+  },
+  {
+    name: "Moonlight Powerline",
+    themeTag: "moonlight-powerline",
+    contrib: [
+      {
+        name: "ramonsaraiva",
+        link: "https://github.com/ramonsaraiva",
+      },
+    ],
+  },
+];
+
+export { moduleNames, modulesData, themesData };
