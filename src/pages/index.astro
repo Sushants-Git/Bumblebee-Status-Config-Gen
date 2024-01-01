@@ -40,6 +40,31 @@ import InputField from "../components/InputField";
     background-color: var(--bg-color);
     color: var(--primary-color);
     font-family: var(--primary-font);
+    padding-bottom: 10vh;
+  }
+
+  .github-logo a {
+    text-decoration: none;
+    color: var(--primary-color);
+    display: flex;
+    gap: 10px;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 0.5rem;
+    box-sizing: content-box;
+    cursor: pointer;
+  }
+
+  .github-logo svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .github-logo a:hover {
+    background-color: var(--border-color);
   }
 
   .container {
@@ -71,10 +96,10 @@ import InputField from "../components/InputField";
     font-family: inherit;
     border: 1px solid var(--border-color);
     min-width: 390px;
-    
-    -moz-appearance:none; /* Firefox */
-    -webkit-appearance:none; /* Safari and Chrome */
-    appearance:none;
+
+    -moz-appearance: none; /* Firefox */
+    -webkit-appearance: none; /* Safari and Chrome */
+    appearance: none;
   }
 
   .tags-wrapper {
@@ -132,6 +157,10 @@ import InputField from "../components/InputField";
     color: var(--bg-color);
   }
 
+  .input-and-autocomplete-wrapper{
+    width: 390px;
+  }
+
   #created-tags-wrapper {
     display: flex;
     flex-wrap: wrap;
@@ -167,6 +196,19 @@ import InputField from "../components/InputField";
     border-top: none;
   }
 
+  .name {
+    display: inline-block;
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 7px;
+  }
+
+  .description {
+    /* display: inline-block; */
+    font-size: 1rem;
+    margin-bottom: 14px;
+  }
+
   .output-text {
     margin-top: 30px;
     margin-bottom: 30px;
@@ -187,10 +229,9 @@ import InputField from "../components/InputField";
     position: absolute;
     bottom: 15px;
     right: 15px;
-
+    border: 1px solid var(--border-color);
     height: 40px;
     width: 40px;
-    border: none;
     color: var(--primary-color);
     cursor: pointer;
     padding: 0;
@@ -203,7 +244,7 @@ import InputField from "../components/InputField";
   }
 
   .copy-button:hover {
-    background-color: #0a0a0a;
+    background-color: var(--border-color);
   }
 
   .parameters-wrapper {
@@ -211,8 +252,32 @@ import InputField from "../components/InputField";
     margin: auto;
   }
 
+  .dependencies {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-right: 1rem;
+  }
+
+  .contrib-links {
+    text-decoration: none;
+    color: #48baff;
+  }
+
+  .parameters-name {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 7px;
+  }
+
   .parameters-input-wrappers input {
     font-size: 1rem;
+  }
+
+  .name-and-description-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-bottom: 16px;
   }
 
   .parameters-input-wrappers .name-and-description {
@@ -225,6 +290,7 @@ import InputField from "../components/InputField";
     align-items: center;
     align-items: center;
     gap: 5px;
+    margin-bottom: 10px;
   }
 
   .change-default {

@@ -7,19 +7,30 @@ export default function InputAndTags({
   themesData,
   setSelectedTheme,
   selectedTheme,
+  autocompleteResults,
+  setAutocompleteResults,
 }) {
   return (
     <div className="tags-wrapper">
       <div id="tags-input-wrapper">
         <div className="input-wrapper">
           <label htmlFor="tags">Modules</label>
-          <input
-            type="text"
-            value={inputValue}
-            id="tags"
-            ref={inputRef}
-            onChange={handleInputOnChange}
-          />
+          <div className="input-and-autocomplete-wrapper">
+            <input
+              type="text"
+              value={inputValue}
+              id="tags"
+              ref={inputRef}
+              onChange={handleInputOnChange}
+            />
+            <div>
+              <ul id="autocomplete-results">
+                {autocompleteResults.map((item) => (
+                  <li>{item.name}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
         <div className="input-wrapper">
           <label htmlFor="theme-select">Theme</label>

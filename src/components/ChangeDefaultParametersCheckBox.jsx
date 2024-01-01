@@ -21,15 +21,17 @@ export default function ChangeDefaultParametersCheckBox({
     }
   }
   return (
-    <div className="change-default-wrapper">
-      <input
-        type="checkbox"
-        id={`change-${id}`}
-        className="change-default"
-        name="Change Defaults"
-        onChange={handleChange}
-      />
-      <label htmlFor={`change-${id}`}>Change Defaults</label>
-    </div>
+    <>
+      <div className="change-default-wrapper">
+        <input
+          type="checkbox"
+          id={`change-${id}`}
+          className="change-default"
+          name="Change Defaults"
+          onChange={handleChange}
+        />
+        <label htmlFor={`change-${id}`}>Change Defaults</label>
+      </div>
+    </>
   );
 }

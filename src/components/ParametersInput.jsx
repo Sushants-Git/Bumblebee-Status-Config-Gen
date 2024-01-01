@@ -10,9 +10,9 @@ export default function ParametersInput({
       {module.parameters.map((parameter, parameterIndex) => {
         let { name, description, defaultChoice, example } = parameter;
         return (
-          <div key={`${name}-${id}`}>
+          <div key={`${name}-${id}`} className="name-and-description-wrapper">
             <div className="name-and-description">
-              {name} : {description}
+              <span className="parameters-name">{name}</span> : {description}
             </div>
             <div>
               <input
