@@ -49,55 +49,8 @@ export default function ({ theme }) {
     { name: "solarized_image", value: solarized_image },
   ];
 
-  //   console.log(ThemeImages.length);
-  //   console.log(default_image);
-  //   const [fetchedImages, setFetchedImages] = useState(false);
-  //   const [themeImages, setThemeImages] = useState([]);
-
-  //   const importImages = async () => {
-  //     const imagePaths = import.meta.glob(
-  //       "/assets_themes/*.{png,jpg,jpeg,svg,webp}"
-  //     );
-  //     const images = {};
-
-  //     for (const path in imagePaths) {
-  //       const imageModule = await imagePaths[path]();
-  //       images[path] = imageModule.default || imageModule;
-  //     }
-
-  //     const imageArray = Object.entries(images).map((design) => {
-  //       return {
-  //         imagePath: design,
-  //       };
-  //     });
-
-  //     console.log(imageArray);
-
-  //     // console.log(imageArray);
-  //     setFetchedImages(true);
-  //     setThemeImages((prevValue) => imageArray);
-
-  //     // return imageArray;
-  //   };
-
-  //   if (!fetchedImages) {
-  //     importImages();
-  //   }
-
-  //   function getSrc() {
-  //     // console.log(themeImages);
-  //     const imageSrc = themeImages.find(
-  //       (image) => image.imagePath[0] === `/assets_themes/${theme}.webp`
-  //     );
-  //     // console.log(theme);
-  //     // console.log(imageSrc);
-  //     // console.log(themeImages);
-  //     return imageSrc;
-  //   }
-
   let imageSrc = "";
   let tempTheme = theme.split("");
-  //   console.log(theme);
 
   for (let i = 0; i < tempTheme.length; i++) {
     if (tempTheme[i] === "-") {
