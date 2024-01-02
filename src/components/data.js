@@ -1211,7 +1211,7 @@ const modulesData = [
     name: "cpu2",
     description: "Multiwidget CPU module",
     tech: ["ex", "ex"],
-    requirements: ["psutil", "sensors executable"],
+    requirements: ["psutil", "sensors_executable"],
     parameters: [
       {
         name: "cpu2.layout",
@@ -1247,7 +1247,7 @@ const modulesData = [
     name: "cpu3",
     description: "Multiwidget CPU module",
     tech: ["ex", "ex"],
-    requirements: ["psutil", "sensors executable"],
+    requirements: ["psutil", "sensors_executable"],
     parameters: [
       {
         name: "cpu3.layout",

@@ -35,11 +35,11 @@ export default function InputAndTags({
               <ul className="autocomplete-results">
                 {autocompleteResults.map((item) => (
                   <li
+                    key={item.name}
                     onClick={(event) => {
                       handleInputOnChange({
                         target: { value: event.target.innerText + " " },
                       });
-                      // console.log(event.target.innerText);
                     }}
                   >
                     {item.name}

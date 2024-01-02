@@ -49,11 +49,28 @@ export default function InputField() {
     );
   }
 
-  dependencies = dependenciesArray
-    .map((obj) => {
-      return obj.value;
-    })
-    .join(" ");
+  // dependencies = dependenciesArray
+  //   .map((obj) => {
+  //     // console.log(obj);
+  //     return obj.value;
+  //   })
+  //   .join(" ");
+
+  dependencies = dependenciesArray.map((obj) => {
+    return (
+      <span style={{ color: getDependenciesStyle(obj.tech) }} key={uuidv4()}>
+        {obj.value}{" "}
+      </span>
+    );
+  });
+
+  function getDependenciesStyle(packageName) {
+    if (packageName === "py") {
+      return "#48FF4F";
+    } else if (packageName === "ex") {
+      return "#48baff";
+    }
+  }
 
   const [pathToBumblebee, setPathToBumblebee] = useState(
     "<path to bumblebee-status/bumblebee-status>"
@@ -306,6 +323,29 @@ export default function InputField() {
           )}
           {dependencies}
         </div>
+        <div className="dependencies-type">
+          <span className="dependencies" style={{ visibility: "hidden" }}>
+            dependencies
+          </span>
+          {dependenciesArray.length ? (
+            <div className="box-wrappers">
+              <div className="green-color-div">
+                <div className="box"></div>
+                <div>Python</div>
+              </div>
+              <div className="blue-color-div">
+                <div className="box"></div>
+                <div>Executable</div>
+              </div>
+              <div className="white-color-div">
+                <div className="box"></div>
+                <div>Unknown</div>
+              </div>
+            </div>
+          ) : (
+            ""
+          )}
+        </div>
         {modulesArray.map((module, index) => {
           let { id, name, description, parameters } = module;
           return (
@@ -313,9 +353,10 @@ export default function InputField() {
               <div>
                 <span className="name">{name}</span>{" "}
                 {module.contrib ? "by " : ""}
-                {module.contrib?.map(({ name, link }) => (
+                {module.contrib?.map(({ name, link }, index, array) => (
                   <a href={link} className="contrib-links" target="_blank">
-                    {name}{" "}
+                    {name}
+                    {index === array.length - 1 ? " " : ", "}
                   </a>
                 ))}
                 <div className="description">{description}</div>
