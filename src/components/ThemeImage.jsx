@@ -61,36 +61,18 @@ export default function ({ theme }) {
   tempTheme = tempTheme.join("");
 
   tempTheme += "_image";
-  imageSrc = tempTheme;
-
-  if (theme === "<theme>") {
-    imageSrc = "";
-  }
-
-  //   console.log(imageSrc);
 
   ThemeImages.forEach((image) => {
-    if (image.name === imageSrc) {
+    if (image.name === tempTheme) {
       imageSrc = image.value;
     }
   });
 
   return (
-    // <>
-    //   {theme !== "<theme>" && fetchedImages ? (
-    //     <div className="theme-image">
-    //       <img src={imageSrc} alt={theme} />
-    //     </div>
-    //   ) : theme === "<theme>" ? (
-    //     ""
-    //   ) : (
-    //     <div className="theme-image">Fetching Images please Wait</div>
-    //   )}
-    // </>
     <>
       {theme !== "<theme>" ? (
         <div className="theme-image">
-          <img src={imageSrc.src} alt={theme} />
+          <img src={imageSrc?.src} alt={theme} />
         </div>
       ) : (
         ""
