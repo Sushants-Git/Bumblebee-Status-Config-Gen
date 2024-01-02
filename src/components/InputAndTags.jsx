@@ -20,6 +20,7 @@ export default function InputAndTags({
             value={inputValue}
             id="tags"
             ref={inputRef}
+            placeholder="<module name> <press space>"
             onChange={handleInputOnChange}
           />
           <div

@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import InputAndTags from "./InputAndTags.jsx";
 import ChangeDefaultParametersCheckBox from "./ChangeDefaultParametersCheckBox.jsx";
 import ParametersInput from "./ParametersInput.jsx";
+import ThemeImage from "./ThemeImage.jsx";
 
 import { Toaster, toast } from "sonner";
 
@@ -306,6 +307,7 @@ export default function InputField() {
         autocompleteResults={autocompleteResults}
         setAutocompleteResults={setAutocompleteResults}
       />
+      <ThemeImage theme={theme} />
       <OutputText>
         <pre>
           {outputText}
