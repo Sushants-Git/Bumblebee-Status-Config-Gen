@@ -49,18 +49,22 @@ export default function ({ theme }) {
   }
 
   if (!fetchedImages) {
-    return <div className="theme-image">Fetching Images please Wait</div>;
+    return <div className="theme-image"></div>;
   }
 
   return (
     <>
-      {theme !== "<theme>" ? (
+      {theme !== "<theme>" && fetchedImages ? (
         <div className="theme-image">
           <img src={imageSrc} alt={theme} />
         </div>
-      ) : (
+      ) : theme === "<theme>" ? (
         ""
+      ) : (
+        <div className="theme-image">Fetching Images please Wait</div>
       )}
     </>
   );
 }
+
+// Fetching Images please Wait
