@@ -1,70 +1,146 @@
 import { useState } from "react";
-// import image4 from "/assets_themes/dracula-powerline.webp";
+
+import default_image from "./assets_themes/default.webp";
+import dracula_powerline_image from "./assets_themes/dracula-powerline.webp";
+import greyish_powerline_image from "./assets_themes/greyish-powerline.webp";
+import gruvbox_light_image from "./assets_themes/gruvbox-light.webp";
+import gruvbox_powerline_light_image from "./assets_themes/gruvbox-powerline-light.webp";
+import gruvbox_powerline_image from "./assets_themes/gruvbox-powerline.webp";
+import gruvbox_image from "./assets_themes/gruvbox.webp";
+import iceberg_contrast_image from "./assets_themes/iceberg-contrast.webp";
+import iceberg_dark_powerline_image from "./assets_themes/iceberg-dark-powerline.webp";
+import iceberg_powerline_image from "./assets_themes/iceberg-powerline.webp";
+import iceberg_rainbow_image from "./assets_themes/iceberg-rainbow.webp";
+import iceberg_image from "./assets_themes/iceberg.webp";
+import moonlight_powerline_image from "./assets_themes/moonlight-powerline.webp";
+import night_powerline_image from "./assets_themes/night-powerline.webp";
+import nord_powerline_image from "./assets_themes/nord-powerline.webp";
+import onedark_powerline_image from "./assets_themes/onedark-powerline.webp";
+import powerline_image from "./assets_themes/powerline.webp";
+import solarized_powerline_image from "./assets_themes/solarized-powerline.webp";
+import solarized_image from "./assets_themes/solarized.webp";
 
 export default function ({ theme }) {
-  const [fetchedImages, setFetchedImages] = useState(false);
-  const [themeImages, setThemeImages] = useState([]);
+  const ThemeImages = [
+    { name: "default_image", value: default_image },
+    { name: "dracula_powerline_image", value: dracula_powerline_image },
+    { name: "greyish_powerline_image", value: greyish_powerline_image },
+    { name: "gruvbox_light_image", value: gruvbox_light_image },
+    {
+      name: "gruvbox_powerline_light_image",
+      value: gruvbox_powerline_light_image,
+    },
+    { name: "gruvbox_powerline_image", value: gruvbox_powerline_image },
+    { name: "gruvbox_image", value: gruvbox_image },
+    { name: "iceberg_contrast_image", value: iceberg_contrast_image },
+    {
+      name: "iceberg_dark_powerline_image",
+      value: iceberg_dark_powerline_image,
+    },
+    { name: "iceberg_powerline_image", value: iceberg_powerline_image },
+    { name: "iceberg_rainbow_image", value: iceberg_rainbow_image },
+    { name: "iceberg_image", value: iceberg_image },
+    { name: "moonlight_powerline_image", value: moonlight_powerline_image },
+    { name: "night_powerline_image", value: night_powerline_image },
+    { name: "nord_powerline_image", value: nord_powerline_image },
+    { name: "onedark_powerline_image", value: onedark_powerline_image },
+    { name: "powerline_image", value: powerline_image },
+    { name: "solarized_powerline_image", value: solarized_powerline_image },
+    { name: "solarized_image", value: solarized_image },
+  ];
 
-  const importImages = async () => {
-    const imagePaths = import.meta.glob(
-      "/assets_themes/*.{png,jpg,jpeg,svg,webp}"
-    );
-    const images = {};
+  //   console.log(ThemeImages.length);
+  //   console.log(default_image);
+  //   const [fetchedImages, setFetchedImages] = useState(false);
+  //   const [themeImages, setThemeImages] = useState([]);
 
-    for (const path in imagePaths) {
-      const imageModule = await imagePaths[path]();
-      images[path] = imageModule.default || imageModule;
-    }
+  //   const importImages = async () => {
+  //     const imagePaths = import.meta.glob(
+  //       "/assets_themes/*.{png,jpg,jpeg,svg,webp}"
+  //     );
+  //     const images = {};
 
-    const imageArray = Object.entries(images).map((design) => {
-      return {
-        imagePath: design,
-      };
-    });
+  //     for (const path in imagePaths) {
+  //       const imageModule = await imagePaths[path]();
+  //       images[path] = imageModule.default || imageModule;
+  //     }
 
-    console.log(imageArray);
+  //     const imageArray = Object.entries(images).map((design) => {
+  //       return {
+  //         imagePath: design,
+  //       };
+  //     });
 
-    // console.log(imageArray);
-    setFetchedImages(true);
-    setThemeImages((prevValue) => imageArray);
+  //     console.log(imageArray);
 
-    // return imageArray;
-  };
+  //     // console.log(imageArray);
+  //     setFetchedImages(true);
+  //     setThemeImages((prevValue) => imageArray);
 
-  if (!fetchedImages) {
-    importImages();
-  }
+  //     // return imageArray;
+  //   };
 
-  function getSrc() {
-    // console.log(themeImages);
-    const imageSrc = themeImages.find(
-      (image) => image.imagePath[0] === `/assets_themes/${theme}.webp`
-    );
-    // console.log(theme);
-    // console.log(imageSrc);
-    // console.log(themeImages);
-    return imageSrc;
-  }
+  //   if (!fetchedImages) {
+  //     importImages();
+  //   }
+
+  //   function getSrc() {
+  //     // console.log(themeImages);
+  //     const imageSrc = themeImages.find(
+  //       (image) => image.imagePath[0] === `/assets_themes/${theme}.webp`
+  //     );
+  //     // console.log(theme);
+  //     // console.log(imageSrc);
+  //     // console.log(themeImages);
+  //     return imageSrc;
+  //   }
 
   let imageSrc = "";
-  if (themeImages.length !== 0) {
-    imageSrc = getSrc()?.imagePath[1].src;
+  let tempTheme = theme.split("");
+  //   console.log(theme);
+
+  for (let i = 0; i < tempTheme.length; i++) {
+    if (tempTheme[i] === "-") {
+      tempTheme[i] = "_";
+    }
   }
 
-  if (!fetchedImages) {
-    return <div className="theme-image"></div>;
+  tempTheme = tempTheme.join("");
+
+  tempTheme += "_image";
+  imageSrc = tempTheme;
+
+  if (theme === "<theme>") {
+    imageSrc = "";
   }
+
+  //   console.log(imageSrc);
+
+  ThemeImages.forEach((image) => {
+    if (image.name === imageSrc) {
+      imageSrc = image.value;
+    }
+  });
 
   return (
+    // <>
+    //   {theme !== "<theme>" && fetchedImages ? (
+    //     <div className="theme-image">
+    //       <img src={imageSrc} alt={theme} />
+    //     </div>
+    //   ) : theme === "<theme>" ? (
+    //     ""
+    //   ) : (
+    //     <div className="theme-image">Fetching Images please Wait</div>
+    //   )}
+    // </>
     <>
-      {theme !== "<theme>" && fetchedImages ? (
+      {theme !== "<theme>" ? (
         <div className="theme-image">
-          <img src={imageSrc} alt={theme} />
+          <img src={imageSrc.src} alt={theme} />
         </div>
-      ) : theme === "<theme>" ? (
-        ""
       ) : (
-        <div className="theme-image">Fetching Images please Wait</div>
+        ""
       )}
     </>
   );
