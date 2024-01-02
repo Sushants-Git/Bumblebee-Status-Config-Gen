@@ -1,4 +1,5 @@
 import { useState } from "react";
+// import image4 from "/assets_themes/dracula-powerline.webp";
 
 export default function ({ theme }) {
   const [fetchedImages, setFetchedImages] = useState(false);
@@ -6,7 +7,7 @@ export default function ({ theme }) {
 
   const importImages = async () => {
     const imagePaths = import.meta.glob(
-      "../assets_themes/*.{png,jpg,jpeg,svg,webp}"
+      "/assets_themes/*.{png,jpg,jpeg,svg,webp}"
     );
     const images = {};
 
@@ -20,6 +21,8 @@ export default function ({ theme }) {
         imagePath: design,
       };
     });
+
+    console.log(imageArray);
 
     // console.log(imageArray);
     setFetchedImages(true);
@@ -35,7 +38,7 @@ export default function ({ theme }) {
   function getSrc() {
     // console.log(themeImages);
     const imageSrc = themeImages.find(
-      (image) => image.imagePath[0] === `../assets_themes/${theme}.webp`
+      (image) => image.imagePath[0] === `/assets_themes/${theme}.webp`
     );
     // console.log(theme);
     // console.log(imageSrc);
