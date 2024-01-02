@@ -15,18 +15,35 @@ export default function InputAndTags({
       <div id="tags-input-wrapper">
         <div className="input-wrapper">
           <label htmlFor="tags">Modules</label>
-          <div className="input-and-autocomplete-wrapper">
-            <input
-              type="text"
-              value={inputValue}
-              id="tags"
-              ref={inputRef}
-              onChange={handleInputOnChange}
-            />
+          <input
+            type="text"
+            value={inputValue}
+            id="tags"
+            ref={inputRef}
+            onChange={handleInputOnChange}
+          />
+          <div
+            className="autocomplete-wrapper"
+            style={
+              autocompleteResults.length
+                ? { display: "flex" }
+                : { display: "none" }
+            }
+          >
+            <label htmlFor="tags">Modules</label>
             <div>
-              <ul id="autocomplete-results">
+              <ul className="autocomplete-results">
                 {autocompleteResults.map((item) => (
-                  <li>{item.name}</li>
+                  <li
+                    onClick={(event) => {
+                      handleInputOnChange({
+                        target: { value: event.target.innerText + " " },
+                      });
+                      // console.log(event.target.innerText);
+                    }}
+                  >
+                    {item.name}
+                  </li>
                 ))}
               </ul>
             </div>
