@@ -1,5 +1,9 @@
 # Bumblebee-Status-Config-Gen
 
+## About
+
+This project is a website that lets anyone easily generate configurations for [bumblebee-status](https://github.com/tobi-wan-kenobi/bumblebee-status)
+
 ## 🚀 Project Structure
 
 ```text
@@ -17,10 +21,6 @@
 │
 └── package.json
 ```
-
-## About
-
-This project is a website that lets anyone easily generate configurations for [bumblebee-status](https://github.com/tobi-wan-kenobi/bumblebee-status)
 
 ## 🧞 Commands
 
