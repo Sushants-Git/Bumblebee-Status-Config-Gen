@@ -48,6 +48,10 @@ export default function ({ theme }) {
     imageSrc = getSrc()?.imagePath[1].src;
   }
 
+  if (!fetchedImages) {
+    return <div className="theme-image">Fetching Images please Wait</div>;
+  }
+
   return (
     <>
       {theme !== "<theme>" ? (
