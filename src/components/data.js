@@ -529,7 +529,7 @@ const modulesData = [
     description:
       "Displays volume and mute status and controls for PulseAudio devices. Use wheel up and down to change volume, left click mutes, right click opens pavucontrol.",
     tech: ["py"],
-    requirements: ["pulsectl"],
+    requirements: ["pulsectl", "tkinter"],
     parameters: [
       {
         name: "pulseout.autostart",
@@ -580,7 +580,7 @@ const modulesData = [
     description:
       "Displays volume and mute status and controls for PulseAudio devices. Use wheel up and down to change volume, left click mutes, right click opens pavucontrol.",
     tech: ["py"],
-    requirements: ["pulsectl"],
+    requirements: ["pulsectl", "tkinter"],
     parameters: [
       {
         name: "pulsein.autostart",
