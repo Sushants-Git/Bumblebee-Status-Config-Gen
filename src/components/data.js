@@ -15,7 +15,8 @@ const moduleNames = [
   "nic",
   "ping",
   "pulseaudio",
-  "pulsectl",
+  "pulseout",
+  "pulsein",
   "redshift",
   "scroll",
   "sensors2",
@@ -524,49 +525,100 @@ const modulesData = [
     ],
   },
   {
-    name: "pulsectl",
+    name: "pulseout",
     description:
       "Displays volume and mute status and controls for PulseAudio devices. Use wheel up and down to change volume, left click mutes, right click opens pavucontrol.",
     tech: ["py"],
     requirements: ["pulsectl"],
     parameters: [
       {
-        name: "pulsectl.autostart",
+        name: "pulseout.autostart",
         description:
           "If set to ‘true’ (default is ‘false’), automatically starts the pulsectl daemon if it is not running",
         defaultChoice: "false",
         example: "false, true",
       },
       {
-        name: "pulsectl.percent_change",
+        name: "pulseout.percent_change",
         description:
           "How much to change volume by when scrolling on the module (default is 2%)",
         defaultChoice: "2%",
         example: "2%, 5%",
       },
       {
-        name: "pulsectl.limit",
+        name: "pulseout.limit",
         description:
           "Upper limit for setting the volume (default is 0%, which means ‘no limit’)",
         defaultChoice: "0%",
         example: "10%, 20%",
       },
       {
-        name: "pulsectl.popup-filter",
+        name: "pulseout.popup-filter",
         description:
           "Comma-separated list of device strings (if the device name contains it) to exclude from the default device popup menu (e.g. Monitor for sources)",
         defaultChoice: "",
         example: "Monitor, Headphones",
       },
       {
-        name: "pulsectl.showbars",
+        name: "pulseout.showbars",
         description:
           "‘true’ for showing volume bars, requires –markup=pango; ‘false’ for not showing volume bars (default)",
         defaultChoice: "false",
         example: "false, true",
       },
       {
-        name: "pulsectl.showdevicename",
+        name: "pulseout.showdevicename",
+        description:
+          "If set to ‘true’ (default is ‘false’), the currently selected default device is shown. Per default, the sink/source name returned by “pactl list sinks short” is used as display name.",
+        defaultChoice: "false",
+        example: "false, true",
+      },
+    ],
+  },
+  {
+    name: "pulsein",
+    description:
+      "Displays volume and mute status and controls for PulseAudio devices. Use wheel up and down to change volume, left click mutes, right click opens pavucontrol.",
+    tech: ["py"],
+    requirements: ["pulsectl"],
+    parameters: [
+      {
+        name: "pulsein.autostart",
+        description:
+          "If set to ‘true’ (default is ‘false’), automatically starts the pulsectl daemon if it is not running",
+        defaultChoice: "false",
+        example: "false, true",
+      },
+      {
+        name: "pulsein.percent_change",
+        description:
+          "How much to change volume by when scrolling on the module (default is 2%)",
+        defaultChoice: "2%",
+        example: "2%, 5%",
+      },
+      {
+        name: "pulsein.limit",
+        description:
+          "Upper limit for setting the volume (default is 0%, which means ‘no limit’)",
+        defaultChoice: "0%",
+        example: "10%, 20%",
+      },
+      {
+        name: "pulsein.popup-filter",
+        description:
+          "Comma-separated list of device strings (if the device name contains it) to exclude from the default device popup menu (e.g. Monitor for sources)",
+        defaultChoice: "",
+        example: "Monitor, Headphones",
+      },
+      {
+        name: "pulsein.showbars",
+        description:
+          "‘true’ for showing volume bars, requires –markup=pango; ‘false’ for not showing volume bars (default)",
+        defaultChoice: "false",
+        example: "false, true",
+      },
+      {
+        name: "pulsein.showdevicename",
         description:
           "If set to ‘true’ (default is ‘false’), the currently selected default device is shown. Per default, the sink/source name returned by “pactl list sinks short” is used as display name.",
         defaultChoice: "false",
