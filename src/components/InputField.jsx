@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { modulesData, themesData } from "./data.js";
 
 import { v4 as uuidv4 } from "uuid";
@@ -10,59 +10,131 @@ import ThemeImage from "./ThemeImage.jsx";
 
 import { Toaster, toast } from "sonner";
 
-export default function InputField() {
-  const [modulesArray, setModulesArray] = useState([]);
-  const [checkedArray, setCheckedArray] = useState([]);
-  const inputRef = useRef(null);
-  const [inputValue, setInputValue] = useState("");
-  const [modulesParameters, setModulesParameters] = useState([]);
-  const [changeIfParameterAdded, setChangeIfParameterAdded] = useState(false);
-  const [unCheckedToggle, setUnCheckedToggle] = useState({
-    value: false,
-    id: null,
+const PATH_PLACEHOLDER = "<path to bumblebee-status/bumblebee-status>";
+
+const moduleByName = new Map(
+  modulesData.map((module) => [module.name, module]),
+);
+
+function createModule(name, values = {}) {
+  return {
+    id: uuidv4(),
+    name,
+    checked: Object.keys(values).length > 0,
+    values,
+  };
+}
+
+// Quote a parameter value for the shell that runs status_command
+function shellQuote(value) {
+  if (/^[\w.,:%/@+=-]+$/.test(value)) return value;
+  return `'${value.replace(/'/g, `'\\''`)}'`;
+}
+
+// Hash format: #m=cpu disk&t=gruvbox&cpu.warning=50
+function readStateFromHash() {
+  const params = new URLSearchParams(window.location.hash.slice(1));
+  const names = (params.get("m") || "").split(/\s+/).filter(Boolean);
+  const seen = new Set();
+
+  const modules = names
+    .filter(
+      (name) => moduleByName.has(name) && !seen.has(name) && seen.add(name),
+    )
+    .map((name) => {
+      const values = {};
+      moduleByName.get(name).parameters?.forEach((parameter) => {
+        const value = params.get(parameter.name);
+        if (value) values[parameter.name] = value;
+      });
+      return createModule(name, values);
+    });
+
+  const theme = params.get("t") || "";
+  return {
+    modules,
+    theme: themesData.some((t) => t.themeTag === theme) ? theme : "",
+  };
+}
+
+function writeStateToHash(modules, selectedTheme) {
+  const params = new URLSearchParams();
+  if (modules.length) params.set("m", modules.map((m) => m.name).join(" "));
+  if (selectedTheme) params.set("t", selectedTheme);
+  modules.forEach((module) => {
+    if (!module.checked) return;
+    Object.entries(module.values).forEach(([name, value]) => {
+      if (value.trim() !== "") params.set(name, value.trim());
+    });
   });
-  const [copyButtonClicked, setCopyButtonClicked] = useState(false);
+
+  const hash = params.toString();
+  const url =
+    window.location.pathname +
+    window.location.search +
+    (hash ? `#${hash}` : "");
+  window.history.replaceState(null, "", url);
+}
+
+function buildConfig(modules, selectedTheme, withPlaceholders) {
+  const parameters = modules
+    .filter((module) => module.checked)
+    .flatMap((module) =>
+      Object.entries(module.values)
+        .filter(([, value]) => value.trim() !== "")
+        .map(([name, value]) => `${name}=${shellQuote(value.trim())}`),
+    );
+
+  const lines = [
+    `status_command ${PATH_PLACEHOLDER}`,
+    modules.length
+      ? `-m ${modules.map((module) => module.name).join(" ")}`
+      : withPlaceholders && "-m <list of modules>",
+    parameters.length
+      ? `-p ${parameters.join(" ")}`
+      : withPlaceholders && "-p <list of module parameters>",
+    selectedTheme ? `-t ${selectedTheme}` : withPlaceholders && "-t <theme>",
+  ].filter(Boolean);
+
+  const body = lines
+    .map((line, index) => (index === 0 ? `\t${line}` : `\t\t${line}`))
+    .join(" \\\n");
+
+  return `bar {\n${body}\n}`;
+}
+
+export default function InputField() {
+  const [modules, setModules] = useState([]);
   const [selectedTheme, setSelectedTheme] = useState("");
+  const [inputValue, setInputValue] = useState("");
+  const [inputError, setInputError] = useState("");
   const [autocompleteResults, setAutocompleteResults] = useState([]);
+  const [copyButtonClicked, setCopyButtonClicked] = useState(false);
+  const [loadedFromUrl, setLoadedFromUrl] = useState(false);
 
-  // console.log("modulesArray", modulesArray);
-  // console.log("checkArray", checkedArray);
-  // console.log("modulesParameters", modulesParameters);
+  useEffect(() => {
+    const { modules, theme } = readStateFromHash();
+    setModules(modules);
+    setSelectedTheme(theme);
+    setLoadedFromUrl(true);
+  }, []);
 
-  let dependencies = null;
-  let dependenciesArray = [];
+  useEffect(() => {
+    if (loadedFromUrl) writeStateToHash(modules, selectedTheme);
+  }, [modules, selectedTheme, loadedFromUrl]);
 
-  for (let i = 0; i < modulesArray.length; i++) {
-    if (!modulesArray[i].requirements) continue;
-    modulesArray[i].requirements.forEach((requirement, index) => {
-      if (notInDependenciesArray(requirement)) {
-        dependenciesArray.push({
-          value: requirement,
-          tech: modulesArray[i].tech[index],
-        });
+  const dependenciesArray = [];
+  modules.forEach((module) => {
+    const { requirements, tech } = moduleByName.get(module.name);
+    requirements?.forEach((requirement, index) => {
+      if (
+        !dependenciesArray.some(
+          (dependency) => dependency.value === requirement,
+        )
+      ) {
+        dependenciesArray.push({ value: requirement, tech: tech?.[index] });
       }
     });
-  }
-
-  function notInDependenciesArray(requirement) {
-    return !dependenciesArray.some(
-      (requirementObj) => requirementObj.value === requirement
-    );
-  }
-
-  // dependencies = dependenciesArray
-  //   .map((obj) => {
-  //     // console.log(obj);
-  //     return obj.value;
-  //   })
-  //   .join(" ");
-
-  dependencies = dependenciesArray.map((obj) => {
-    return (
-      <span style={{ color: getDependenciesStyle(obj.tech) }} key={uuidv4()}>
-        {obj.value}{" "}
-      </span>
-    );
   });
 
   function getDependenciesStyle(packageName) {
@@ -73,168 +145,76 @@ export default function InputField() {
     }
   }
 
-  const [pathToBumblebee, setPathToBumblebee] = useState(
-    "<path to bumblebee-status/bumblebee-status>"
-  );
-  const [listOfModules, setListOfModules] = useState("<list of modules>");
-  const [listOfModuleParams, setListOfModuleParams] = useState(
-    "<list of module parameters>"
-  );
-  const [theme, setTheme] = useState("<theme>");
-
-  const outputText = ` bar {
-    \tstatus_command ${pathToBumblebee} \\
-    \t\t-m ${listOfModules} \\
-    \t\t-p ${listOfModuleParams} \\
-    \t\t-t ${theme}
-        }`;
-
-  useEffect(() => {
-    setListOfModules(() => {
-      if (modulesArray.length === 0) {
-        return "<list of modules>";
-      }
-      return modulesArray.map((module) => module.name).join(" ");
-    });
-  }, [modulesArray]);
-
-  useEffect(
-    function () {
-      let hasParameters = false;
-      let temp = "";
-      let cleanDefaultsOf = null;
-
-      modulesParameters.forEach((modulesParameter, index) => {
-        if (!modulesParameter.parameters) return;
-        if (checkedArray[index] === false) {
-          if (
-            modulesArray[index].id ===
-            unCheckedToggle.id.substring("change-".length)
-          ) {
-            cleanDefaultsOf = unCheckedToggle.id.substring("change-".length);
-            return;
-          } else {
-            return;
-          }
-        }
-        modulesParameter.parameters.map((parameter) => {
-          if (parameter.currentValue !== "") {
-            temp += `${parameter.name}="` + `${parameter.currentValue}" `;
-            hasParameters = true;
-          }
-        });
-      });
-      if (!hasParameters) {
-        temp = "<list of module parameters>";
-      }
-
-      setListOfModuleParams((preValue) => {
-        return temp;
-      });
-
-      if (cleanDefaultsOf === null) {
-        return;
-      } else {
-        setModulesParameters((preModuleParameters) => {
-          let tempPreModuleParameters = [...preModuleParameters];
-          console.log(tempPreModuleParameters);
-          tempPreModuleParameters.forEach((moduleParameter, index) => {
-            if (moduleParameter.id === cleanDefaultsOf) {
-              moduleParameter.parameters.forEach(
-                (parameter) => (parameter.currentValue = "")
-              );
-            }
-          });
-          return tempPreModuleParameters;
-        });
-      }
-    },
-    [changeIfParameterAdded, modulesArray.length, unCheckedToggle.value]
-  );
-
-  useEffect(() => {
-    setTheme((preValue) => {
-      if (selectedTheme === "") {
-        return "<theme>";
-      }
-      const theme = themesData.find(
-        (theme) => theme.themeTag === selectedTheme
-      );
-      return theme.themeTag;
-    });
-  }, [selectedTheme]);
-
   function handleInputOnChange(event) {
     let value = event.target.value.toLowerCase();
     if (value[value.length - 1] === " " && value.trim() !== "") {
-      const module = modulesData.find((module) => module.name === value.trim());
-      if (module && !doesModuleAlreadyExist(value)) {
-        addTag(module);
+      const name = value.trim();
+      if (!moduleByName.has(name)) {
+        setInputValue(name);
+        setInputError(`No module called "${name}"`);
+        setAutocompleteResults([]);
+        return;
+      }
+      if (modules.some((module) => module.name === name)) {
+        setInputError(`"${name}" is already added`);
+      } else {
+        setModules((preModules) => preModules.concat(createModule(name)));
+        setInputError("");
       }
       setInputValue("");
       setAutocompleteResults([]);
     } else {
       setInputValue(value);
-      if (value === "") {
+      setInputError("");
+      if (value.trim() === "") {
         setAutocompleteResults([]);
       } else {
         setAutocompleteResults(
-          modulesData.filter((module) => {
-            return (
-              module.name.substring(0, value.length).toLowerCase() ===
-              value.toLowerCase()
-            );
-          })
+          modulesData.filter((module) =>
+            module.name.toLowerCase().startsWith(value.trim()),
+          ),
         );
       }
     }
   }
 
-  function doesModuleAlreadyExist(value) {
-    return modulesArray.some((module) => module.name === value.trim());
-  }
-
-  const getParams = (module) =>
-    module.parameters.map((parameter) => ({ ...parameter, currentValue: "" }));
-
-  function addTag(module) {
-    let id = uuidv4();
-
-    setModulesArray((preModules) => preModules.concat({ ...module, id: id }));
-
-    setModulesParameters((preModuleParameters) => {
-      let newModuleParameter = module.parameters
-        ? {
-            id: id,
-            hasParameters: true,
-            parameters: getParams(module),
-          }
-        : { hasParameters: false };
-
-      return preModuleParameters.concat(newModuleParameter);
-    });
+  function updateModule(id, update) {
+    setModules((preModules) =>
+      preModules.map((module) => (module.id === id ? update(module) : module)),
+    );
   }
 
   function deleteTag(id) {
-    const elementToBeDeletedIndex = modulesArray.findIndex(
-      (module) => module.id === id
-    );
+    setModules((preModules) => preModules.filter((module) => module.id !== id));
+  }
 
-    const removeElementAtIndex = (array, index) => {
-      let tempArray = [...array];
-      tempArray.splice(index, 1);
-      return tempArray;
-    };
+  function moveModule(index, offset) {
+    setModules((preModules) => {
+      const target = index + offset;
+      if (target < 0 || target >= preModules.length) return preModules;
+      const tempModules = [...preModules];
+      [tempModules[index], tempModules[target]] = [
+        tempModules[target],
+        tempModules[index],
+      ];
+      return tempModules;
+    });
+  }
 
-    setModulesArray((preModules) =>
-      removeElementAtIndex(preModules, elementToBeDeletedIndex)
-    );
-    setCheckedArray((prevChecked) =>
-      removeElementAtIndex(prevChecked, elementToBeDeletedIndex)
-    );
-    setModulesParameters((preModuleParameters) =>
-      removeElementAtIndex(preModuleParameters, elementToBeDeletedIndex)
-    );
+  function setChecked(id, checked) {
+    // Unchecking "Change Defaults" drops the values entered for that module
+    updateModule(id, (module) => ({
+      ...module,
+      checked,
+      values: checked ? module.values : {},
+    }));
+  }
+
+  function setParameter(id, name, value) {
+    updateModule(id, (module) => ({
+      ...module,
+      values: { ...module.values, [name]: value },
+    }));
   }
 
   function copiedIcon() {
@@ -247,23 +227,8 @@ export default function InputField() {
 
   function onClickCopyButton() {
     if (!copyButtonClicked) {
-      let copiedText = `bar {\n\tstatus_command ${pathToBumblebee} \\`;
+      const copiedText = buildConfig(modules, selectedTheme, false);
 
-      if (listOfModules !== "<list of modules>") {
-        copiedText += `\n\t\t-m ${listOfModules} \\`;
-      }
-
-      if (listOfModuleParams !== "<list of module parameters>") {
-        copiedText += `\n\t\t-p ${listOfModuleParams} \\`;
-      }
-
-      if (theme !== "<theme>") {
-        copiedText += `\n\t\t-t ${theme}`;
-      }
-
-      copiedText += "\n}";
-
-      console.log(copiedText);
       navigator.clipboard.writeText(copiedText).then(() => {
         toast.message("Copied to clipboard !", {
           description:
@@ -280,6 +245,7 @@ export default function InputField() {
         <a
           href="https://github.com/Sushants-Git/Bumblebee-Status-Config-Gen"
           target="_blank"
+          rel="noopener noreferrer"
         >
           <GitHubLogo />
           GitHub
@@ -297,9 +263,9 @@ export default function InputField() {
       />
       <InputAndTags
         inputValue={inputValue}
-        inputRef={inputRef}
+        inputError={inputError}
         handleInputOnChange={handleInputOnChange}
-        modulesArray={modulesArray}
+        modulesArray={modules}
         deleteTag={deleteTag}
         themesData={themesData}
         selectedTheme={selectedTheme}
@@ -307,14 +273,16 @@ export default function InputField() {
         autocompleteResults={autocompleteResults}
         setAutocompleteResults={setAutocompleteResults}
       />
-      <ThemeImage theme={theme} />
+      <ThemeImage theme={selectedTheme || "<theme>"} />
       <OutputText>
-        <pre>
-          {outputText}
-          <button className="copy-button" onClick={onClickCopyButton}>
-            {!copyButtonClicked ? <CopyButton /> : <CopiedButton />}
-          </button>
-        </pre>
+        <pre>{buildConfig(modules, selectedTheme, true)}</pre>
+        <button
+          className="copy-button"
+          onClick={onClickCopyButton}
+          aria-label="Copy config"
+        >
+          {!copyButtonClicked ? <CopyButton /> : <CopiedButton />}
+        </button>
       </OutputText>
       <div className="parameters-wrapper">
         <div>
@@ -323,10 +291,20 @@ export default function InputField() {
           ) : (
             ""
           )}
-          {dependencies}
+          {dependenciesArray.map((dependency) => (
+            <span
+              style={{ color: getDependenciesStyle(dependency.tech) }}
+              key={dependency.value}
+            >
+              {dependency.value}{" "}
+            </span>
+          ))}
         </div>
         <div className="dependencies-type">
-          <span className="dependencies" style={{ visibility: "hidden" }}>
+          <span
+            className="dependencies dependencies-spacer"
+            style={{ visibility: "hidden" }}
+          >
             dependencies
           </span>
           {dependenciesArray.length ? (
@@ -348,40 +326,65 @@ export default function InputField() {
             ""
           )}
         </div>
-        {modulesArray.map((module, index) => {
-          let { id, name, description, parameters } = module;
+        {modules.map((module, index) => {
+          const { id, name, checked, values } = module;
+          const { description, parameters, contrib } = moduleByName.get(name);
           return (
             <div className="module-wrapper" data-id={id} key={id}>
-              <div>
-                <span className="name">{name}</span>{" "}
-                {module.contrib ? "by " : ""}
-                {module.contrib?.map(({ name, link }, index, array) => (
-                  <a href={link} className="contrib-links" target="_blank">
-                    {name}
-                    {index === array.length - 1 ? " " : ", "}
-                  </a>
-                ))}
-                <div className="description">{description}</div>
+              <div className="module-header">
+                <div>
+                  <span className="name">{name}</span> {contrib ? "by " : ""}
+                  {contrib?.map(({ name, link }, index, array) => (
+                    <a
+                      href={link}
+                      className="contrib-links"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      key={`${name}-${index}`}
+                    >
+                      {name}
+                      {index === array.length - 1 ? " " : ", "}
+                    </a>
+                  ))}
+                </div>
+                <div className="reorder-buttons">
+                  <button
+                    onClick={() => moveModule(index, -1)}
+                    disabled={index === 0}
+                    aria-label={`Move ${name} earlier in the bar`}
+                    title="Move up"
+                  >
+                    ↑
+                  </button>
+                  <button
+                    onClick={() => moveModule(index, 1)}
+                    disabled={index === modules.length - 1}
+                    aria-label={`Move ${name} later in the bar`}
+                    title="Move down"
+                  >
+                    ↓
+                  </button>
+                </div>
               </div>
+              <div className="description">{description}</div>
               <div>
                 {parameters && (
                   <ChangeDefaultParametersCheckBox
                     id={id}
-                    index={index}
-                    checkedArray={checkedArray}
-                    setCheckedArray={setCheckedArray}
-                    setUnCheckedToggle={setUnCheckedToggle}
+                    checked={checked}
+                    onChange={(checked) => setChecked(id, checked)}
                   />
                 )}
               </div>
               <div>
-                {checkedArray[index] && module.parameters && (
+                {checked && parameters && (
                   <ParametersInput
                     id={id}
-                    index={index}
-                    setModulesParameters={setModulesParameters}
-                    setChangeIfParameterAdded={setChangeIfParameterAdded}
-                    module={module}
+                    parameters={parameters}
+                    values={values}
+                    onChange={(parameterName, value) =>
+                      setParameter(id, parameterName, value)
+                    }
                   />
                 )}
               </div>

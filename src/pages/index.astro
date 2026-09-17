@@ -34,6 +34,8 @@ import InputField from "../components/InputField";
     --primary-font: "Lexend Deca", sans-serif;
     --secondary-font: "Space Grotesk", sans-serif;
     --border-color: #282828;
+    --muted-color: #9a9a9a;
+    --error-color: #ff6b6b;
   }
 
   body {
@@ -194,7 +196,7 @@ import InputField from "../components/InputField";
     border-bottom-right-radius: 5px;
   }
 
-  .autocomplete-results li:hover {
+  .autocomplete-results li.active {
     background-color: var(--primary-color);
     color: var(--bg-color);
   }
@@ -213,7 +215,11 @@ import InputField from "../components/InputField";
     gap: 5px;
   }
 
-  #created-tags-wrapper span {
+  #created-tags-wrapper .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: inherit;
     padding: 4px 9px;
     border-radius: 3px;
     font-size: 1.25rem;
@@ -223,7 +229,19 @@ import InputField from "../components/InputField";
     cursor: pointer;
   }
 
-  #created-tags-wrapper span:hover {
+  .tag-remove {
+    color: var(--muted-color);
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  #created-tags-wrapper .tag:hover .tag-remove,
+  #created-tags-wrapper .tag:focus-visible .tag-remove {
+    color: inherit;
+  }
+
+  #created-tags-wrapper .tag:hover,
+  #created-tags-wrapper .tag:focus-visible {
     border: 1px solid var(--primary-color);
     background: var(--primary-color);
     color: var(--bg-color);
@@ -260,31 +278,34 @@ import InputField from "../components/InputField";
     align-items: center;
     margin-left: auto;
     margin-right: auto;
+    max-width: 100%;
     border: 1px dashed var(--border-color);
     padding: 0.5rem 1rem;
   }
 
   .theme-image img {
     /* width: 50vw; */
-    max-width: 90vw;
+    max-width: 100%;
     height: 10%;
     object-fit: cover;
   }
 
   .output-text {
-    margin-top: 30px;
-    margin-bottom: 30px;
+    position: relative;
+    width: max-content;
+    max-width: 100%;
+    margin: 30px auto;
   }
 
   .output-text pre {
-    position: relative;
     font-family: var(--secondary-font);
     line-height: 1.2;
     font-size: 1rem;
-    width: max-content;
-    margin: auto;
+    margin: 0;
+    overflow-x: auto;
+    tab-size: 4;
     border: 2px dashed var(--border-color);
-    padding: 1rem 2rem;
+    padding: 1rem 4.5rem 1rem 2rem;
   }
 
   .copy-button {
@@ -310,7 +331,7 @@ import InputField from "../components/InputField";
   }
 
   .parameters-wrapper {
-    width: 70vw;
+    width: min(70vw, 1000px);
     margin: auto;
   }
 
@@ -326,6 +347,7 @@ import InputField from "../components/InputField";
 
   .box-wrappers {
     display: flex;
+    flex-wrap: wrap;
     margin-top: 10px;
     gap: 20px;
   }
@@ -402,6 +424,137 @@ import InputField from "../components/InputField";
 
   .example {
     margin-left: 10px;
-    color: var(--border-color);
+    color: var(--muted-color);
+  }
+
+  .parameters-input-wrappers .name-and-description {
+    display: block;
+    overflow-wrap: anywhere;
+  }
+
+  .module-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .reorder-buttons {
+    display: flex;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+
+  .reorder-buttons button {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--primary-color);
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .reorder-buttons button:hover:not(:disabled) {
+    background-color: var(--border-color);
+  }
+
+  .reorder-buttons button:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .input-error {
+    min-height: 1.2em;
+    margin: -4px 0 6px auto;
+    width: 390px;
+    max-width: 100%;
+    font-size: 0.9rem;
+    color: var(--error-color);
+  }
+
+  .input-error:empty {
+    display: none;
+  }
+
+  @media (max-width: 700px) {
+    body {
+      margin: 0;
+    }
+
+    .container {
+      margin-top: 4vh;
+      padding: 0 16px;
+    }
+
+    .tags-wrapper,
+    #tags-input-wrapper {
+      width: 100%;
+    }
+
+    .input-wrapper {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+    }
+
+    .input-wrapper input,
+    select {
+      width: 100%;
+      min-width: 0;
+      max-width: none;
+    }
+
+    .autocomplete-wrapper {
+      top: 100%;
+      margin-top: 4px;
+    }
+
+    .autocomplete-wrapper label,
+    .tags-created label,
+    .dependencies-spacer {
+      display: none;
+    }
+
+    .autocomplete-wrapper > div,
+    .autocomplete-results {
+      width: 100%;
+    }
+
+    .autocomplete-results li {
+      overflow-wrap: anywhere;
+    }
+
+    .input-error {
+      width: 100%;
+      margin-top: 0;
+    }
+
+    .output-text pre {
+      font-size: 0.85rem;
+      padding: 1rem 3.5rem 1rem 1rem;
+    }
+
+    .parameters-wrapper {
+      width: 100%;
+    }
+
+    .parameters-input-wrappers input {
+      width: 100%;
+      max-width: none;
+    }
+
+    .example {
+      display: block;
+      margin: 6px 0 0;
+    }
+
+    .github-logo a {
+      bottom: 12px;
+      left: 12px;
+      background-color: var(--bg-color);
+    }
   }
 </style>

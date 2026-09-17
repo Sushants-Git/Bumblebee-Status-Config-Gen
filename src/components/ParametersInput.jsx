@@ -1,33 +1,20 @@
-export default function ParametersInput({
-  id,
-  index,
-  setModulesParameters,
-  setChangeIfParameterAdded,
-  module,
-}) {
+export default function ParametersInput({ id, parameters, values, onChange }) {
   return (
     <div className="parameters-input-wrappers">
-      {module.parameters.map((parameter, parameterIndex) => {
+      {parameters.map((parameter) => {
         let { name, description, defaultChoice, example } = parameter;
         return (
           <div key={`${name}-${id}`} className="name-and-description-wrapper">
-            <div className="name-and-description">
+            <label className="name-and-description" htmlFor={`${name}-${id}`}>
               <span className="parameters-name">{name}</span> : {description}
-            </div>
+            </label>
             <div>
               <input
                 type="text"
+                id={`${name}-${id}`}
                 placeholder={defaultChoice}
-                onChange={(event) => {
-                  setModulesParameters((preModuleParameters) => {
-                    let tempPreModuleParameters = [...preModuleParameters];
-                    tempPreModuleParameters[index].parameters[
-                      parameterIndex
-                    ].currentValue = event.target.value.trim();
-                    return tempPreModuleParameters;
-                  });
-                  setChangeIfParameterAdded((preValue) => !preValue);
-                }}
+                value={values[name] ?? ""}
+                onChange={(event) => onChange(name, event.target.value)}
               />
               <span className="example">
                 {example === "" ? "" : `Eg : ${example}`}

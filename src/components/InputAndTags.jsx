@@ -1,6 +1,8 @@
+import { useEffect, useRef, useState } from "react";
+
 export default function InputAndTags({
   inputValue,
-  inputRef,
+  inputError,
   handleInputOnChange,
   modulesArray,
   deleteTag,
@@ -10,6 +12,54 @@ export default function InputAndTags({
   autocompleteResults,
   setAutocompleteResults,
 }) {
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const listRef = useRef(null);
+
+  useEffect(() => {
+    setActiveIndex(-1);
+  }, [autocompleteResults]);
+
+  useEffect(() => {
+    if (activeIndex < 0 || !listRef.current) return;
+    listRef.current.children[activeIndex]?.scrollIntoView({ block: "nearest" });
+  }, [activeIndex]);
+
+  function selectResult(item) {
+    handleInputOnChange({ target: { value: item.name + " " } });
+  }
+
+  function handleKeyDown(event) {
+    const count = autocompleteResults.length;
+    if (!count) {
+      if (event.key === "Enter" && inputValue.trim() !== "") {
+        event.preventDefault();
+        handleInputOnChange({ target: { value: inputValue.trim() + " " } });
+      }
+      return;
+    }
+
+    switch (event.key) {
+      case "ArrowDown":
+        event.preventDefault();
+        setActiveIndex((index) => (index + 1) % count);
+        break;
+      case "ArrowUp":
+        event.preventDefault();
+        setActiveIndex((index) => (index <= 0 ? count - 1 : index - 1));
+        break;
+      case "Enter":
+      case "Tab":
+        if (activeIndex < 0 && event.key === "Tab") return;
+        event.preventDefault();
+        selectResult(autocompleteResults[Math.max(activeIndex, 0)]);
+        break;
+      case "Escape":
+        event.preventDefault();
+        setAutocompleteResults([]);
+        break;
+    }
+  }
+
   return (
     <div className="tags-wrapper">
       <div id="tags-input-wrapper">
@@ -19,9 +69,20 @@ export default function InputAndTags({
             type="text"
             value={inputValue}
             id="tags"
-            ref={inputRef}
             placeholder="<module name> <press space>"
             onChange={handleInputOnChange}
+            onKeyDown={handleKeyDown}
+            role="combobox"
+            aria-expanded={autocompleteResults.length > 0}
+            aria-controls="autocomplete-results"
+            aria-activedescendant={
+              activeIndex >= 0
+                ? `autocomplete-option-${activeIndex}`
+                : undefined
+            }
+            autoComplete="off"
+            aria-invalid={inputError !== ""}
+            aria-describedby="tags-error"
           />
           <div
             className="autocomplete-wrapper"
@@ -33,15 +94,21 @@ export default function InputAndTags({
           >
             <label htmlFor="tags">Modules</label>
             <div>
-              <ul className="autocomplete-results">
-                {autocompleteResults.map((item) => (
+              <ul
+                className="autocomplete-results"
+                id="autocomplete-results"
+                role="listbox"
+                ref={listRef}
+              >
+                {autocompleteResults.map((item, index) => (
                   <li
                     key={item.name}
-                    onClick={(event) => {
-                      handleInputOnChange({
-                        target: { value: event.target.innerText + " " },
-                      });
-                    }}
+                    id={`autocomplete-option-${index}`}
+                    role="option"
+                    aria-selected={index === activeIndex}
+                    className={index === activeIndex ? "active" : ""}
+                    onMouseEnter={() => setActiveIndex(index)}
+                    onClick={() => selectResult(item)}
                   >
                     {item.name}
                   </li>
@@ -50,6 +117,9 @@ export default function InputAndTags({
             </div>
           </div>
         </div>
+        <p className="input-error" id="tags-error" role="status">
+          {inputError}
+        </p>
         <div className="input-wrapper">
           <label htmlFor="theme-select">Theme</label>
           <select
@@ -77,16 +147,19 @@ export default function InputAndTags({
                 {modulesArray.map((module) => {
                   const { id, name } = module;
                   return (
-                    <span
+                    <button
+                      type="button"
                       className="tag"
-                      data-id={id}
                       key={id}
-                      onClick={(event) => {
-                        deleteTag(event.target.dataset.id);
-                      }}
+                      onClick={() => deleteTag(id)}
+                      aria-label={`Remove ${name}`}
+                      title={`Remove ${name}`}
                     >
                       {name}
-                    </span>
+                      <span className="tag-remove" aria-hidden="true">
+                        ×
+                      </span>
+                    </button>
                   );
                 })}
               </div>
