@@ -13,9 +13,13 @@ const moduleNames = [
   "load",
   "memory",
   "nic",
+  "pasink",
+  "pasource",
   "ping",
   "pulseaudio",
   "pulsectl",
+  "pulsein",
+  "pulseout",
   "redshift",
   "scroll",
   "sensors2",
@@ -23,8 +27,10 @@ const moduleNames = [
   "speedtest",
   "test",
   "time",
+  "upower",
   "vault",
   "xrandr",
+  "aerlive",
   "amixer",
   "apt",
   "arandr",
@@ -39,6 +45,7 @@ const moduleNames = [
   "blugon",
   "brightness",
   "caffeine",
+  "calendar",
   "cmus",
   "cpu2",
   "cpu3",
@@ -52,6 +59,7 @@ const moduleNames = [
   "dunst",
   "dunstctl",
   "emerge_status",
+  "epoch",
   "gcalendar",
   "getcrypto",
   "github",
@@ -73,7 +81,9 @@ const moduleNames = [
   "notmuch_count",
   "nvidiagpu",
   "octoprint",
+  "oled_offset",
   "optman",
+  "otp",
   "pacman",
   "pamixer",
   "persian_date",
@@ -82,13 +92,17 @@ const moduleNames = [
   "playerctl",
   "pomodoro",
   "portage_status",
+  "power-profile",
+  "power_profile",
   "prime",
   "progress",
   "publicip",
   "rofication",
   "rotation",
   "rss",
+  "scratchpad",
   "sensors",
+  "sensors-aquacomputer",
   "shell",
   "shortcut",
   "smartstatus",
@@ -107,6 +121,7 @@ const moduleNames = [
   "todoist",
   "traffic",
   "twmn",
+  "uhnode",
   "uptime",
   "usage",
   "vpn",
@@ -251,6 +266,15 @@ const modulesData = [
       "Print the branch and git status for the currently focused window.",
     tech: ["", "py"],
     requirements: ["xcwd", "pygit2"],
+    parameters: [
+      {
+        name: "git.draw_order",
+        description:
+          'String to specify draw order of the widgets; Options are "ltr" for left to right, and "rtl" for right to left (defaults to "ltr")',
+        defaultChoice: "ltr",
+        example: "ltr, rtl",
+      },
+    ],
   },
   {
     name: "keys",
@@ -271,18 +295,25 @@ const modulesData = [
     requirements: ["libX11.so.6", "xkbgroup"],
     parameters: [
       {
-        name: "layout-xkb.showname",
+        name: "layout.showname",
         description:
           "Boolean that indicate whether the full name should be displayed. Defaults to false (only the symbol will be displayed)",
         defaultChoice: "false",
         example: "true or false",
       },
       {
-        name: "layout-xkb.show_variant",
+        name: "layout.show_variant",
         description:
           "Boolean that indecates whether the variant name should be displayed. Defaults to true.",
         defaultChoice: "true",
         example: "true or false",
+      },
+      {
+        name: "layout.highlight_if_not",
+        description:
+          'String that indicates the highlight_if_not layout. Widget goes into "warning" state if not on the highlight_if_not layout. If not set, the widget never indicates a "warning"',
+        defaultChoice: "",
+        example: "us, de",
       },
     ],
   },
@@ -306,6 +337,13 @@ const modulesData = [
         defaultChoice: "true",
         example: "true or false",
       },
+      {
+        name: "layout-xkb.highlight_if_not",
+        description:
+          'String that indicates the highlight_if_not layout. Widget goes into "warning" state if not on the highlight_if_not layout. If not set, the widget never indicates a "warning"',
+        defaultChoice: "",
+        example: "us, de",
+      },
     ],
   },
   {
@@ -315,18 +353,25 @@ const modulesData = [
     requirements: ["libX11.so.6", "xkbgroup"],
     parameters: [
       {
-        name: "layout-xkb.showname",
+        name: "layout_xkb.showname",
         description:
           "Boolean that indicate whether the full name should be displayed. Defaults to false (only the symbol will be displayed)",
         defaultChoice: "false",
         example: "true or false",
       },
       {
-        name: "layout-xkb.show_variant",
+        name: "layout_xkb.show_variant",
         description:
           "Boolean that indecates whether the variant name should be displayed. Defaults to true.",
         defaultChoice: "true",
         example: "true or false",
+      },
+      {
+        name: "layout_xkb.highlight_if_not",
+        description:
+          'String that indicates the highlight_if_not layout. Widget goes into "warning" state if not on the highlight_if_not layout. If not set, the widget never indicates a "warning"',
+        defaultChoice: "",
+        example: "us, de",
       },
     ],
   },
@@ -439,6 +484,94 @@ const modulesData = [
     ],
   },
   {
+    name: "pasink",
+    description:
+      "Alias of pulseaudio that controls output (sink) devices. Displays volume and mute status and controls for PulseAudio devices. Use wheel up and down to change volume, left click mutes, right click opens pavucontrol. This module will eventually be deprecated (bad performance and high CPU load) in favour of pulsectl, which is a drop-in replacement.",
+    tech: ["ex", "ex", "ex"],
+    requirements: ["pulseaudio", "pactl", "pavucontrol"],
+    parameters: [
+      {
+        name: "pasink.autostart",
+        description:
+          "If set to ‘true’ (default is ‘false’), automatically starts the pulseaudio daemon if it is not running",
+        defaultChoice: "false",
+        example: "false, true",
+      },
+      {
+        name: "pasink.percent_change",
+        description:
+          "How much to change volume by when scrolling on the module (default is 2%)",
+        defaultChoice: "2%",
+        example: "5%, 7%",
+      },
+      {
+        name: "pasink.limit",
+        description:
+          "Upper limit for setting the volume (default is 0%, which means ‘no limit’) Note: If the left and right channels have different volumes, the limit might not be reached exactly.",
+        defaultChoice: "0%",
+        example: "10%, 20%",
+      },
+      {
+        name: "pasink.showbars",
+        description:
+          "1 for showing volume bars, requires –markup=pango; 0 for not showing volume bars (default)",
+        defaultChoice: "0",
+        example: "0, 1",
+      },
+      {
+        name: "pasink.showdevicename",
+        description:
+          "If set to ‘true’ (default is ‘false’), the currently selected default device is shown. Per default, the sink/source name returned by “pactl list sinks short” is used as display name.",
+        defaultChoice: "false",
+        example: "false, true",
+      },
+    ],
+  },
+  {
+    name: "pasource",
+    description:
+      "Alias of pulseaudio that controls input (source) devices. Displays volume and mute status and controls for PulseAudio devices. Use wheel up and down to change volume, left click mutes, right click opens pavucontrol. This module will eventually be deprecated (bad performance and high CPU load) in favour of pulsectl, which is a drop-in replacement.",
+    tech: ["ex", "ex", "ex"],
+    requirements: ["pulseaudio", "pactl", "pavucontrol"],
+    parameters: [
+      {
+        name: "pasource.autostart",
+        description:
+          "If set to ‘true’ (default is ‘false’), automatically starts the pulseaudio daemon if it is not running",
+        defaultChoice: "false",
+        example: "false, true",
+      },
+      {
+        name: "pasource.percent_change",
+        description:
+          "How much to change volume by when scrolling on the module (default is 2%)",
+        defaultChoice: "2%",
+        example: "5%, 7%",
+      },
+      {
+        name: "pasource.limit",
+        description:
+          "Upper limit for setting the volume (default is 0%, which means ‘no limit’) Note: If the left and right channels have different volumes, the limit might not be reached exactly.",
+        defaultChoice: "0%",
+        example: "10%, 20%",
+      },
+      {
+        name: "pasource.showbars",
+        description:
+          "1 for showing volume bars, requires –markup=pango; 0 for not showing volume bars (default)",
+        defaultChoice: "0",
+        example: "0, 1",
+      },
+      {
+        name: "pasource.showdevicename",
+        description:
+          "If set to ‘true’ (default is ‘false’), the currently selected default device is shown. Per default, the sink/source name returned by “pactl list sinks short” is used as display name.",
+        defaultChoice: "false",
+        example: "false, true",
+      },
+    ],
+  },
+  {
     name: "ping",
     description:
       "Periodically checks the RTT of a configurable host using ICMP echos",
@@ -480,9 +613,9 @@ const modulesData = [
     ],
   },
   {
-    name: "pulseaudio **Will be deprecated**",
+    name: "pulseaudio",
     description:
-      "Displays volume and mute status and controls for PulseAudio devices. Use wheel up and down to change volume, left click mutes, right click opens pavucontrol.",
+      "Displays volume and mute status and controls for PulseAudio devices. Use wheel up and down to change volume, left click mutes, right click opens pavucontrol. This module will eventually be deprecated (bad performance and high CPU load) in favour of pulsectl, which is a drop-in replacement.",
     tech: ["ex", "ex", "ex"],
     requirements: ["pulseaudio", "pactl", "pavucontrol"],
     parameters: [
@@ -567,6 +700,108 @@ const modulesData = [
       },
       {
         name: "pulsectl.showdevicename",
+        description:
+          "If set to ‘true’ (default is ‘false’), the currently selected default device is shown. Per default, the sink/source name returned by “pactl list sinks short” is used as display name.",
+        defaultChoice: "false",
+        example: "false, true",
+      },
+    ],
+  },
+  {
+    name: "pulsein",
+    description:
+      "Alias of pulsectl that controls input (source) devices. Displays volume and mute status and controls for PulseAudio devices. Use wheel up and down to change volume, left click mutes, right click opens pavucontrol.",
+    tech: ["py"],
+    requirements: ["pulsectl"],
+    parameters: [
+      {
+        name: "pulsein.autostart",
+        description:
+          "If set to ‘true’ (default is ‘false’), automatically starts the pulsectl daemon if it is not running",
+        defaultChoice: "false",
+        example: "false, true",
+      },
+      {
+        name: "pulsein.percent_change",
+        description:
+          "How much to change volume by when scrolling on the module (default is 2%)",
+        defaultChoice: "2%",
+        example: "2%, 5%",
+      },
+      {
+        name: "pulsein.limit",
+        description:
+          "Upper limit for setting the volume (default is 0%, which means ‘no limit’)",
+        defaultChoice: "0%",
+        example: "10%, 20%",
+      },
+      {
+        name: "pulsein.popup-filter",
+        description:
+          "Comma-separated list of device strings (if the device name contains it) to exclude from the default device popup menu (e.g. Monitor for sources)",
+        defaultChoice: "",
+        example: "Monitor, Headphones",
+      },
+      {
+        name: "pulsein.showbars",
+        description:
+          "‘true’ for showing volume bars, requires –markup=pango; ‘false’ for not showing volume bars (default)",
+        defaultChoice: "false",
+        example: "false, true",
+      },
+      {
+        name: "pulsein.showdevicename",
+        description:
+          "If set to ‘true’ (default is ‘false’), the currently selected default device is shown. Per default, the sink/source name returned by “pactl list sinks short” is used as display name.",
+        defaultChoice: "false",
+        example: "false, true",
+      },
+    ],
+  },
+  {
+    name: "pulseout",
+    description:
+      "Alias of pulsectl that controls output (sink) devices. Displays volume and mute status and controls for PulseAudio devices. Use wheel up and down to change volume, left click mutes, right click opens pavucontrol.",
+    tech: ["py"],
+    requirements: ["pulsectl"],
+    parameters: [
+      {
+        name: "pulseout.autostart",
+        description:
+          "If set to ‘true’ (default is ‘false’), automatically starts the pulsectl daemon if it is not running",
+        defaultChoice: "false",
+        example: "false, true",
+      },
+      {
+        name: "pulseout.percent_change",
+        description:
+          "How much to change volume by when scrolling on the module (default is 2%)",
+        defaultChoice: "2%",
+        example: "2%, 5%",
+      },
+      {
+        name: "pulseout.limit",
+        description:
+          "Upper limit for setting the volume (default is 0%, which means ‘no limit’)",
+        defaultChoice: "0%",
+        example: "10%, 20%",
+      },
+      {
+        name: "pulseout.popup-filter",
+        description:
+          "Comma-separated list of device strings (if the device name contains it) to exclude from the default device popup menu (e.g. Monitor for sources)",
+        defaultChoice: "",
+        example: "Monitor, Headphones",
+      },
+      {
+        name: "pulseout.showbars",
+        description:
+          "‘true’ for showing volume bars, requires –markup=pango; ‘false’ for not showing volume bars (default)",
+        defaultChoice: "false",
+        example: "false, true",
+      },
+      {
+        name: "pulseout.showdevicename",
         description:
           "If set to ‘true’ (default is ‘false’), the currently selected default device is shown. Per default, the sink/source name returned by “pactl list sinks short” is used as display name.",
         defaultChoice: "false",
@@ -766,6 +1001,28 @@ const modulesData = [
     ],
   },
   {
+    name: "upower",
+    description: "Displays battery level for upower devices",
+    tech: ["py", ""],
+    requirements: ["dbus", "dbus-compatible power devices"],
+    parameters: [
+      {
+        name: "upower.warning",
+        description:
+          "Warning threshold in % of power remaining (defaults to 20%)",
+        defaultChoice: "20",
+        example: "30, 25",
+      },
+      {
+        name: "upower.critical",
+        description:
+          "Critical threshold in % of power remaining (defaults to 10%)",
+        defaultChoice: "10",
+        example: "5, 15",
+      },
+    ],
+  },
+  {
     name: "vault",
     description:
       "Copy passwords from a password store into the clipboard (currently supports only ‘pass’)",
@@ -851,6 +1108,29 @@ const modulesData = [
     ],
   },
   {
+    name: "aerlive",
+    description:
+      "Displays air quality data using the aerlive.ro service (Romania only)",
+    tech: ["py"],
+    requirements: ["requests"],
+    parameters: [
+      {
+        name: "aerlive.unit",
+        description:
+          "Measurement unit: ica (default), ica_co, ica_no2, ica_pm1, ica_pm10, ica_pm25, ica_so2",
+        defaultChoice: "ica",
+        example: "ica_pm25, ica_no2",
+      },
+      {
+        name: "aerlive.city",
+        description:
+          "City ID (currently only Bucharest (BUC) and Cluj-Napoca (CJ) are supported)",
+        defaultChoice: "",
+        example: "BUC, CJ",
+      },
+    ],
+  },
+  {
     name: "amixer",
     description: "get volume level or control it",
     tech: ["ex"],
@@ -885,9 +1165,32 @@ const modulesData = [
   {
     name: "apt",
     description:
-      "Displays APT package update information (<to upgrade>/<to remove >) ",
+      "Displays APT package update information (<to upgrade>/<to remove>/<kept back>)",
     tech: [""],
-    requirements: ["aptitude"],
+    requirements: ["apt"],
+    parameters: [
+      {
+        name: "apt.format",
+        description:
+          'Format string for the output. May contain any combination of the named placeholders {to_upgrade}, {to_remove} and {kept_back}. With the default format, "kept back" is only shown when kept_back > 0.',
+        defaultChoice: "{to_upgrade} to upgrade, {to_remove} to remove",
+        example: "{to_upgrade}/{to_remove}/{kept_back}",
+      },
+      {
+        name: "apt.warning",
+        description:
+          "Integer to set the threshold for warning state (defaults to 0)",
+        defaultChoice: "0",
+        example: "5, 10",
+      },
+      {
+        name: "apt.critical",
+        description:
+          "Integer to set the threshold for critical state (defaults to 50)",
+        defaultChoice: "50",
+        example: "30, 100",
+      },
+    ],
     contrib: [{ name: "qba10", link: "https://github.com/qba10" }],
   },
   {
@@ -1164,8 +1467,62 @@ const modulesData = [
       "xprop (as dependency for xdotool)",
       "notify-send",
     ],
+    parameters: [
+      {
+        name: "caffeine.caffeinated-msg",
+        description: "Notification text to send when turned on",
+        defaultChoice: "Consuming caffeine",
+        example: "Screen lock disabled",
+      },
+      {
+        name: "caffeine.drowsy-msg",
+        description: "Notification text to send when turned off",
+        defaultChoice: "Out of coffee",
+        example: "Screen lock enabled",
+      },
+    ],
     contrib: [
       { name: "TheEdgeOfRage", link: "https://github.com/TheEdgeOfRage" },
+    ],
+  },
+  {
+    name: "calendar",
+    description:
+      "Extended version of datetime module which displays a small popup calendar and can open google calendar in the browser",
+    tech: ["py", "py"],
+    requirements: ["tkinter", "tkcalendar"],
+    parameters: [
+      {
+        name: "calendar.format",
+        description: "strftime()-compatible formatting string",
+        defaultChoice: "%x %X",
+        example:
+          "( %a, %b %d => Tue, Dec 26 ) , ( %A, %b %d => Tuesday, Dec 26 )",
+      },
+      {
+        name: "calendar.locale",
+        description: "locale to use rather than the system default",
+        defaultChoice: "system default",
+        example: "en_US, en_GB, en_ES",
+      },
+      {
+        name: "calendar.bg",
+        description: "background colors. default black.",
+        defaultChoice: "black",
+        example: "#282828, grey",
+      },
+      {
+        name: "calendar.fg",
+        description: "foreground colors. default white.",
+        defaultChoice: "white",
+        example: "#ebdbb2, black",
+      },
+      {
+        name: "calendar.browserpath",
+        description: "path to browser. default /usr/bin/firefox",
+        defaultChoice: "/usr/bin/firefox",
+        example: "/usr/bin/chromium",
+      },
     ],
   },
   {
@@ -1470,7 +1827,7 @@ const modulesData = [
     requirements: ["python-dbus"],
     parameters: [
       {
-        name: "deadbeef.format",
+        name: "deezer.format",
         description:
           "Format string (defaults to ‘{artist} - {title}’) Available values are: {album}, {title}, {artist}, {trackNumber}, {playbackStatus}",
         defaultChoice: "{artist} - {title}",
@@ -1530,7 +1887,7 @@ const modulesData = [
     requirements: ["dunst v1.5.0+"],
     parameters: [
       {
-        name: "dunstctl.disabled(Boolean)",
+        name: "dunstctl.disabled",
         description: "dunst state on start",
         defaultChoice: "False",
         example: "True, False",
@@ -1564,6 +1921,16 @@ const modulesData = [
     ],
   },
   {
+    name: "epoch",
+    description:
+      "Displays the current epoch timestamp. Left click copies it to the clipboard.",
+    tech: ["ex"],
+    requirements: ["xclip"],
+    contrib: [
+      { name: "theymightbetim", link: "https://github.com/theymightbetim" },
+    ],
+  },
+  {
     name: "gcalendar",
     description:
       "Displays first upcoming event in google calendar.Events that are set as ‘all-day’ will not be shown.Requires credentials.json from a google api application where the google calendar api is installed. On first time run the browser will open and google will ask for permission for this app to access the google calendar and then save a .gcalendar_token.json file to the credentials_path directory which stores this permission.A refresh is done every 15 minutes.",
@@ -1572,6 +1939,32 @@ const modulesData = [
       "google-api-python-client",
       "google-auth-httplib2",
       "google-auth-oauthlib",
+    ],
+    parameters: [
+      {
+        name: "gcalendar.time_format",
+        description: 'Format time output. Defaults to "%H:%M".',
+        defaultChoice: "%H:%M",
+        example: "%I:%M %p",
+      },
+      {
+        name: "gcalendar.date_format",
+        description: 'Format date output. Defaults to "%d.%m.%y".',
+        defaultChoice: "%d.%m.%y",
+        example: "%m/%d/%y",
+      },
+      {
+        name: "gcalendar.credentials_path",
+        description: 'Path to credentials.json. Defaults to "~/".',
+        defaultChoice: "~/",
+        example: "~/.config/gcalendar/",
+      },
+      {
+        name: "gcalendar.locale",
+        description: "locale to use rather than the system default.",
+        defaultChoice: "system default",
+        example: "en_US, de_DE",
+      },
     ],
   },
   {
@@ -2019,10 +2412,44 @@ const modulesData = [
     ],
   },
   {
+    name: "oled_offset",
+    description:
+      "Creates an empty widget that changes width on a timer, to reduce chances of OLED burn-in from other bumblebee modules. You should put this module as the last one, so all the other modules are moved when this one changes in width.",
+    contrib: [
+      { name: "TheEdgeOfRage", link: "https://github.com/TheEdgeOfRage" },
+    ],
+  },
+  {
     name: "optman",
     description: "Displays currently active gpu by optimus-manager.",
     tech: [""],
     requirements: ["optimus-manager"],
+  },
+  {
+    name: "otp",
+    description:
+      "One Time Pin Generator. Left click copies the pin to the clipboard.",
+    tech: ["py", "py", "ex"],
+    requirements: ["pyotp", "keyring", "xclip"],
+    parameters: [
+      {
+        name: "otp.service_name",
+        description:
+          "(required) service name where secret_key is stored in keyring",
+        defaultChoice: "",
+        example: "github, aws",
+      },
+      {
+        name: "otp.user_name",
+        description:
+          "(required) username for keyring where secret_key is stored",
+        defaultChoice: "",
+        example: "john",
+      },
+    ],
+    contrib: [
+      { name: "theymightbetim", link: "https://github.com/theymightbetim" },
+    ],
   },
   {
     name: "pacman",
@@ -2117,7 +2544,7 @@ const modulesData = [
     requirements: ["wpctl"],
     parameters: [
       {
-        name: "wpctl.percent_change",
+        name: "pipewire.percent_change",
         description:
           "How much to change volume by when scrolling on the module (default is 4%)",
         defaultChoice: "4%",
@@ -2230,6 +2657,20 @@ const modulesData = [
         link: "https://github.com/andrewreisner",
       },
     ],
+  },
+  {
+    name: "power-profile",
+    description:
+      "Displays the current Power-Profile active. Left-Click or Right-Click as well as Scrolling up / down changes the active Power-Profile",
+    tech: ["py", "ex"],
+    requirements: ["dbus-python", "power-profiles-daemon"],
+  },
+  {
+    name: "power_profile",
+    description:
+      "Displays the current Power-Profile active. Left-Click or Right-Click as well as Scrolling up / down changes the active Power-Profile",
+    tech: ["py", "ex"],
+    requirements: ["dbus-python", "power-profiles-daemon"],
   },
   {
     name: "prime",
@@ -2381,6 +2822,16 @@ const modulesData = [
     ],
   },
   {
+    name: "scratchpad",
+    description:
+      "Displays a count of windows on the scratchpad, Left click to launch a rofi window picker for scratchpads",
+    tech: ["py", "py"],
+    requirements: ["i3ipc", "python-rofi"],
+    contrib: [
+      { name: "theymightbetim", link: "https://github.com/theymightbetim" },
+    ],
+  },
+  {
     name: "sensors",
     description: "Displays sensor temperature",
     tech: [""],
@@ -2440,6 +2891,13 @@ const modulesData = [
         link: "https://github.com/mijoharas",
       },
     ],
+  },
+  {
+    name: "sensors-aquacomputer",
+    description:
+      "Displays coolant loop telemetry from Aquacomputer High Flow NEXT, D5 NEXT pump, and Leakshield devices: coolant temp in/out, flow rate, pump speed, water quality, conductivity and loop pressure. Device names are resolved dynamically from sysfs using stable USB product IDs.",
+    tech: [""],
+    requirements: ["Aquacomputer HID kernel driver (aquacomputer_d5next)"],
   },
   {
     name: "shell",
@@ -3017,6 +3475,11 @@ const modulesData = [
     ],
   },
   {
+    name: "uhnode",
+    description: "Shows User and Hostname in linux",
+    contrib: [{ name: "Jakepys", link: "https://github.com/JuanPerdomo00" }],
+  },
+  {
     name: "uptime",
     description: "Displays the system uptime.",
     tech: [""],
@@ -3210,7 +3673,7 @@ const modulesData = [
         example: "",
       },
       {
-        name: "zpool.format:",
+        name: "zpool.format",
         description:
           "Format string, tags {name}, {used}, {left}, {size}, {percentfree}, {percentuse}, {status}, {shortstatus}, {fragpercent}, {deduppercent} are supported. (Default: ‘{name} {used}/{size} ({percentfree}%)’)",
         defaultChoice: "{name} {used}/{size} ({percentfree}%)",
@@ -3412,6 +3875,54 @@ const themesData = [
         link: "https://github.com/ramonsaraiva",
       },
     ],
+  },
+  {
+    name: "Albiceleste Powerline",
+    themeTag: "albiceleste-powerline",
+  },
+  {
+    name: "Firefox Dark Powerline",
+    themeTag: "firefox-dark-powerline",
+  },
+  {
+    name: "Nord Colorful",
+    themeTag: "nord-colorful",
+  },
+  {
+    name: "Powerline Pango",
+    themeTag: "powerline-pango",
+  },
+  {
+    name: "Rastafari Powerline",
+    themeTag: "rastafari-powerline",
+  },
+  {
+    name: "Rose Pine",
+    themeTag: "rose-pine",
+  },
+  {
+    name: "Sac Red",
+    themeTag: "sac_red",
+  },
+  {
+    name: "Solarized Dark Awesome",
+    themeTag: "solarized-dark-awesome",
+  },
+  {
+    name: "Srcery",
+    themeTag: "srcery",
+  },
+  {
+    name: "Wal Powerline",
+    themeTag: "wal-powerline",
+  },
+  {
+    name: "Zengarden",
+    themeTag: "zengarden",
+  },
+  {
+    name: "Zengarden Powerline Light",
+    themeTag: "zengarden-powerline-light",
   },
 ];
 

@@ -70,7 +70,7 @@ export default function ({ theme }) {
 
   return (
     <>
-      {theme !== "<theme>" ? (
+      {theme !== "<theme>" && imageSrc ? (
         <div className="theme-image">
           <img src={imageSrc?.src} alt={theme} />
         </div>
