@@ -4,18 +4,16 @@ export default function ChangeDefaultParametersCheckBox({
   onChange,
 }) {
   return (
-    <>
-      <div className="change-default-wrapper">
-        <input
-          type="checkbox"
-          id={`change-${id}`}
-          className="change-default"
-          name="Change Defaults"
-          checked={checked}
-          onChange={(event) => onChange(event.target.checked)}
-        />
-        <label htmlFor={`change-${id}`}>Change Defaults</label>
-      </div>
-    </>
+    <label className="change-default-wrapper" htmlFor={`change-${id}`}>
+      <input
+        type="checkbox"
+        id={`change-${id}`}
+        className="change-default"
+        name="Change Defaults"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+      />
+      Change defaults
+    </label>
   );
 }
