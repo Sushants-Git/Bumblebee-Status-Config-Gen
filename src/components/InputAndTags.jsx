@@ -62,14 +62,14 @@ export default function InputAndTags({
 
   return (
     <div className="tags-wrapper">
-      <div id="tags-input-wrapper">
+      <div className="field">
+        <label htmlFor="tags">Modules</label>
         <div className="input-wrapper">
-          <label htmlFor="tags">Modules</label>
           <input
             type="text"
             value={inputValue}
             id="tags"
-            placeholder="<module name> <press space>"
+            placeholder="Type a module name, press space or enter"
             onChange={handleInputOnChange}
             onKeyDown={handleKeyDown}
             role="combobox"
@@ -84,88 +84,74 @@ export default function InputAndTags({
             aria-invalid={inputError !== ""}
             aria-describedby="tags-error"
           />
-          <div
-            className="autocomplete-wrapper"
-            style={
-              autocompleteResults.length
-                ? { display: "flex" }
-                : { display: "none" }
-            }
+          <ul
+            className="autocomplete-results"
+            id="autocomplete-results"
+            role="listbox"
+            ref={listRef}
+            hidden={!autocompleteResults.length}
           >
-            <label htmlFor="tags">Modules</label>
-            <div>
-              <ul
-                className="autocomplete-results"
-                id="autocomplete-results"
-                role="listbox"
-                ref={listRef}
+            {autocompleteResults.map((item, index) => (
+              <li
+                key={item.name}
+                id={`autocomplete-option-${index}`}
+                role="option"
+                aria-selected={index === activeIndex}
+                className={index === activeIndex ? "active" : ""}
+                onMouseEnter={() => setActiveIndex(index)}
+                onClick={() => selectResult(item)}
               >
-                {autocompleteResults.map((item, index) => (
-                  <li
-                    key={item.name}
-                    id={`autocomplete-option-${index}`}
-                    role="option"
-                    aria-selected={index === activeIndex}
-                    className={index === activeIndex ? "active" : ""}
-                    onMouseEnter={() => setActiveIndex(index)}
-                    onClick={() => selectResult(item)}
-                  >
-                    {item.name}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+                <span>{item.name}</span>
+                {item.description && (
+                  <span className="autocomplete-description">
+                    {item.description}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
         </div>
         <p className="input-error" id="tags-error" role="status">
           {inputError}
         </p>
-        <div className="input-wrapper">
-          <label htmlFor="theme-select">Theme</label>
-          <select
-            name="theme"
-            id="theme-select"
-            value={selectedTheme}
-            onChange={(event) => setSelectedTheme(event.target.value)}
-          >
-            <option value="">-- Please choose a theme --</option>
-            {themesData.map((theme) => (
-              <option value={theme.themeTag} key={theme.themeTag}>
-                {theme.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="tags-created">
-          {!!modulesArray.length && (
-            <>
-              <label htmlFor="tags">Modules</label>
-              <div
-                id="created-tags-wrapper"
-                style={{ marginTop: modulesArray.length ? "10px" : "0" }}
-              >
-                {modulesArray.map((module) => {
-                  const { id, name } = module;
-                  return (
-                    <button
-                      type="button"
-                      className="tag"
-                      key={id}
-                      onClick={() => deleteTag(id)}
-                      aria-label={`Remove ${name}`}
-                      title={`Remove ${name}`}
-                    >
-                      {name}
-                      <span className="tag-remove" aria-hidden="true">
-                        ×
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </>
-          )}
-        </div>
+        {!!modulesArray.length && (
+          <div id="created-tags-wrapper">
+            {modulesArray.map((module) => {
+              const { id, name } = module;
+              return (
+                <button
+                  type="button"
+                  className="tag"
+                  key={id}
+                  onClick={() => deleteTag(id)}
+                  aria-label={`Remove ${name}`}
+                  title={`Remove ${name}`}
+                >
+                  {name}
+                  <span className="tag-remove" aria-hidden="true">
+                    ×
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+      <div className="field">
+        <label htmlFor="theme-select">Theme</label>
+        <select
+          name="theme"
+          id="theme-select"
+          value={selectedTheme}
+          onChange={(event) => setSelectedTheme(event.target.value)}
+        >
+          <option value="">Choose a theme</option>
+          {themesData.map((theme) => (
+            <option value={theme.themeTag} key={theme.themeTag}>
+              {theme.name}
+            </option>
+          ))}
+        </select>
       </div>
     </div>
   );
